@@ -371,38 +371,7 @@
 </head>
 <body>
 
-<script>
-    // ============== 【認証設定エリア：ここだけ編集する】 ==============
-    // 貴殿の秘密の認証キーを設定する。
-    const SECRET_KEY = "1122"; 
 
-    // エラーメッセージを設定する。
-    const ACCESS_DENIED_MESSAGE = `
-        <h1>アクセスが拒否されました。</h1>
-        <p>正しい認証キーを入力してください。</p>
-        <p>ツールのご利用には、認証キーによる確認が必要です。</p>
-    `;
-    // ==========================================================
-
-
-    // ツール本体（<body>タグ内の内容）を保護するメイン処理
-    document.addEventListener('DOMContentLoaded', function() {
-        // パスワード入力を求めるダイアログを表示
-        const enteredKey = prompt("認証キーを入力してください:");
-
-        // 認証チェック
-        if (enteredKey !== SECRET_KEY) {
-            // 認証失敗時：<body>タグの中身を全て消去し、拒否メッセージに置き換える
-            document.body.innerHTML = ACCESS_DENIED_MESSAGE;
-            
-            // 重要な点: 認証失敗後は、その後の全てのJavaScriptの実行を停止する
-            throw new Error("認証失敗により処理を中断しました。"); 
-        }
-
-        // 認証成功時：何もしない（ツール本体の表示とJSの実行が続行される）
-        console.log("認証成功。ツールへのアクセスを許可します。");
-    });
-</script>
 
 
 
@@ -844,4 +813,5 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
         init();
     </script>
 </body>
+
 </html>
