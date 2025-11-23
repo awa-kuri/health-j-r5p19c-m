@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>同座 — Doza</title>
+
+
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png"> 
+
+
+<style>
+:root{
+  --bg:#081019; 
+  --fg:#e6edf3; 
+  --muted:#9fb0bf; 
+  --card:#0f1c28;
+  --bubble-grad:linear-gradient(180deg,#ffdfb5ee,#ffb869e6 60%,#ff9c3dcc);
+  --bubble-br:#ffd9a1;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; color:var(--fg);
+  font-family:system-ui,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background:radial-gradient(1200px 800px at 30% 20%,
+  #12283a 0%,
+  #0f2030 45%,
+  var(--bg) 100%);  
+  overflow-x: hidden;   /* ← 横スクロール完全無効化 */
+  overflow-y: auto;}
+
+/* 全体レイアウト */
+.app{display:grid;grid-template-rows:auto 1fr auto;gap:10px;height:100%;padding:14px}
+.header,.footer{display:flex;align-items:center;justify-content:space-between;background: transparent}
+.header h1{margin:0;font-size:1rem;letter-spacing:.06em;font-weight:700}
+.clock{font-variant-numeric:tabular-nums;color:var(--muted);font-size:1rem}
+
+/* 透過カード＆ボタン */
+
+.panel {
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.02),   /* 上部：やや明るい群青 */
+    rgba(255,255,255,.0)  /* 下部：深い青黒 */
+  );
+  border:1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25),0 4px 18px rgba(255,156,61,.20),inset 0 1px 0 rgba(255,255,255,.04), 0 2px 6px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+
+.btn{
+  appearance:none; border:none; border-radius:10px; padding:8px 12px; font-weight:650;
+  color:#1a1006; cursor:pointer;
+  background:linear-gradient(180deg,#ffd9a8,#ffb465 60%,#ff9c3d);
+  box-shadow:0 6px 16px rgba(255,156,61,.35), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.btn:hover{filter:brightness(1.06)}
+.btn:disabled{opacity:.55; cursor:not-allowed}
+.btn.ghost{
+  background:rgba(255,255,255,.06); color:var(--fg);
+  border:1px solid rgba(255,255,255,.16); box-shadow:none
+}
+
+
+.main {
+  background: transparent; /* ← 背景を消す */
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  min-height: 0;
+}
+
+
+
+/* コンパクトなカウンタ */
+.counterWrap{display:flex;flex-direction: column;align-items:center;justify-content:space-between;gap:14px}
+.counter{
+  font-variant-numeric:tabular-nums; font-size:3.8rem; line-height:1; letter-spacing:.02em;
+  text-shadow:0 0 16px rgba(255,156,61,.18)
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;   /* ← 縦並び */
+  align-items: flex-start;  /* ← 左端揃えに変更 */
+  margin: 0 auto;           /* ブロック自体を中央に配置 */
+  width: fit-content;       /* コンテンツ幅に合わせる */
+  text-align: left;
+  gap: 6px;
+}
+
+.meta .item{font-variant-numeric:tabular-nums;font-size:.95rem}
+.meta strong{color:#ffd39b}
+.small{font-size:.9rem}
+
+/* 背景の焔ゆらぎ＆火の粉 */
+
+.flame {
+  position: absolute;
+  inset: 0;   
+  height: 60%;          /* ← 自動ではなく、安定した範囲 */
+  z-index: 0;
+  pointer-events: none;
+ 
+/*   background:
+    radial-gradient(480px 380px at 25% 85%, rgba(255,156,61,.12), transparent 60%),
+    radial-gradient(400px 300px at 35% 95%, rgba(255,156,61,.06), transparent 70%);
+  mix-blend-mode: screen; */
+  animation: breath 6s ease-in-out infinite alternate;
+  overflow: hidden;     /* ← はみ出し防止 */
+}
+
+
+@keyframes breath{0%{opacity:.25; transform:translateY(0)}100%{opacity:.42; transform:translateY(-5px)}}
+.sparks{position:absolute; inset:0; z-index:1; pointer-events:none}
+.spark{
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  background:radial-gradient(circle, #ffd39b, #ff9c3d 70%, transparent 71%);
+  opacity:0; animation:rise 6s linear infinite;
+}
+@keyframes rise{
+  0%{opacity:0; transform:translateY(16px) scale(.5)}
+  40%{opacity:.75}
+  /* 100%{opacity:0; transform:translateY(-220px) translateX(40px) scale(1.2)} */
+100%{opacity:0; transform:translateY(-400px) translateX(var(--driftX)) scale(1.4);}
+  
+}
+
+/* 灯（Canvas：左下、漂い） */
+.entity{position:absolute;left:14px;bottom:18px;width:200px;height:200px;z-index:3;pointer-events:none}
+#torch{position:absolute;inset:0;width:100%;height:100%}
+
+/* 吹き出し（金橙・ノベル風） */
+.bubble{
+  position:absolute; left:220px; bottom:120px; max-width:520px; padding:12px 14px; border-radius:14px;
+  background: var(--bubble-grad); border:1px solid var(--bubble-br);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.32), 0 0 18px rgba(255,156,61,.22), inset 0 0 14px rgba(255,255,255,.12);
+  z-index:3; color:#1b1309;
+}
+.bubble::after{
+  content:""; position:absolute; left:-15.2px; bottom:16px;
+  border-top:5px solid transparent; border-bottom:5px solid transparent; border-right:15px solid rgba(255,200,140,.92)
+}
+.bubble p{margin:0; line-height:1.55}
+
+/* ドロワー（設定＋ログ） */
+.drawerMask{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.2s}
+.drawer{
+  position:fixed;right:-420px;top:0;height:100%;width:360px;background:rgba(15,28,40,.9);
+  border-left:1px solid rgba(255,255,255,.10); box-shadow:-12px 0 28px rgba(0,0,0,.35);
+  transition:.25s; padding:14px; display:flex; flex-direction:column; gap:10px
+}
+body.show-drawer .drawerMask{opacity:1;pointer-events:auto}
+body.show-drawer .drawer{right:0}
+.ctrl label{display:block;color:var(--muted);font-size:.85rem;margin-top:8px}
+.ctrl input[type="text"],.ctrl input[type="number"]{
+  width:100%; padding:8px 10px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.14); background:#0b1621; color:var(--fg)
+}
+.ctrl .btnrow{display:flex;gap:8px;margin-top:10px}
+.statBox{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:#0b1621;border:1px solid rgba(255,255,255,.10);border-radius:10px;text-align:center;padding:8px}
+.stat .k{font-size:.78rem;color:var(--muted)} .stat .v{font-family:ui-monospace,Menlo,monospace;margin-top:4px}
+.log{flex:1;min-height:0;overflow:auto;background:#0b1621;border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:8px}
+.log h3{margin:4px 0 8px 0;font-size:.95rem;color:var(--muted)}
+.log table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.92rem}
+.log th,.log td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
+.log tr:hover{background:rgba(255,255,255,.06)}
+.delBtn{background:transparent;border:1px solid rgba(255,255,255,.2);color:#e6edf3;border-radius:8px;padding:2px 6px;cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<script>
+    // ============== 【認証設定エリア：ここだけ編集する】 ==============
+    // 貴殿の秘密の認証キーを設定する。
+    const SECRET_KEY = "1122"; 
+
+    // エラーメッセージを設定する。
+    const ACCESS_DENIED_MESSAGE = `
+        <h1>アクセスが拒否されました。</h1>
+        <p>正しい認証キーを入力してください。</p>
+        <p>ツールのご利用には、認証キーによる確認が必要です。</p>
+    `;
+    // ==========================================================
+
+
+    // ツール本体（<body>タグ内の内容）を保護するメイン処理
+    document.addEventListener('DOMContentLoaded', function() {
+        // パスワード入力を求めるダイアログを表示
+        const enteredKey = prompt("認証キーを入力してください:");
+
+        // 認証チェック
+        if (enteredKey !== SECRET_KEY) {
+            // 認証失敗時：<body>タグの中身を全て消去し、拒否メッセージに置き換える
+            document.body.innerHTML = ACCESS_DENIED_MESSAGE;
+            
+            // 重要な点: 認証失敗後は、その後の全てのJavaScriptの実行を停止する
+            throw new Error("認証失敗により処理を中断しました。"); 
+        }
+
+        // 認証成功時：何もしない（ツール本体の表示とJSの実行が続行される）
+        console.log("認証成功。ツールへのアクセスを許可します。");
+    });
+</script>
+
+<div class="app">
+  <div class="header">
+    <span class="clock" id="nowClock"></span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="detailBtn" class="btn ghost">詳細</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- 背景：焔ゆらぎ＋火の粉 -->
+    <div class="flame"></div>
+    <div class="sparks" id="sparks"></div>
+
+    <!-- カウンタ -->
+    <div class="panel counterWrap">
+      <div class="counter" id="counter">00:00:00</div>
+      <div class="meta">
+	<div class="item">作業：<strong id="taskName">未設定</strong></div>
+        <div class="item">開始：<span id="startAt">--:--</strong></div>
+        <div class="item">余刻：<span id="remain">—</span></div>
+        </div>
+    </div>
+
+    <!-- 灯＆吹き出し -->
+    <div class="entity"><canvas id="torch" width="200" height="200"></canvas></div>
+    <div class="bubble" id="bubble"><p>……準備が整い次第、始めよう。</p></div>
+  </div>
+
+  <div class="footer">
+    <div class="small" id="todaySum">本日の合計：00:00</div>
+    <div>
+      <button id="startBtn" class="btn">開始</button>
+      <button id="pauseBtn" class="btn" disabled>一時停止</button>
+      <button id="stopBtn" class="btn ghost" disabled>終了</button>
+    </div>
+  </div>
+</div>
+
+<!-- ドロワー（設定＋ログ） -->
+<div class="drawerMask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>設定 / ログ</strong>
+    <button id="closeDrawer" class="btn">閉じる</button>
+  </div>
+  <div class="ctrl">
+    <label>作業名</label>
+    <input id="taskInput" type="text" placeholder="例：職務経歴書の整理" />
+    <div class="statBox" style="margin-top:6px">
+      <div class="stat"><div class="k">開始</div><div class="v" id="statStart">--:--</div></div>
+      <div class="stat"><div class="k">経過</div><div class="v" id="statElapsed">00:00:00</div></div>
+    </div>
+    <label>ランダム発話の最小間隔（分）</label>
+    <input id="minGap" type="number" min="3" max="10" value="3" />
+    <label>ポモドーロ（分）※0で無効</label>
+    <input id="pomo" type="number" min="0" max="120" value="25" />
+    <div class="btnrow">
+      <button id="csvBtn" class="btn ghost">CSV出力</button>
+      <button id="clearBtn" class="btn ghost">ログ全削除</button>
+    </div>
+  </div>
+  <div class="log">
+    <h3>作業ログ</h3>
+    <table id="logTable">
+      <thead><tr><th style="width:42%">作業名</th><th>開始</th><th>終了</th><th>計</th><th>操作</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</aside>
+
+<script>
+
+/* ===== util ===== */
+const $=q=>document.querySelector(q);
+const pad=n=>String(n).padStart(2,'0');
+const fmtTime=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const fmtHM=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const dur=ms=>{const s=Math.max(0,Math.floor(ms/1000));return`${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`};
+const durMM=ms=>{const m=Math.round(ms/60000);return`${pad(Math.floor(m/60))}:${pad(m%60)}`};
+const todayKey=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* ===== clock ===== */
+setInterval(()=>{
+  const d = new Date();
+  const txt = `${d.getMonth()+1}月${pad(d.getDate())}日 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  $("#nowClock").textContent = txt;
+}, 1000);
+
+
+/* ===== drawer ===== */
+function openDrawer(){document.body.classList.add('show-drawer')}
+function closeDrawer(){document.body.classList.remove('show-drawer')}
+$("#detailBtn").onclick=openDrawer; $("#closeDrawer").onclick=closeDrawer; $("#mask").onclick=closeDrawer;
+
+/* ===== state ===== */
+let currentState='idle', running=false, paused=false;
+let startTime=null, pomoMinutes=25, lastInputTime=Date.now();
+let tickId=null, idleId=null, randId=null, chimeId=null, resumeId=null;
+
+/* ===== messages ===== */
+const messages={
+  start:[
+	"……さて、始めようか。",
+	"……始めよう。",
+	"私が傍にいる。任せろ。",
+	"まずは三分だけ集中しろ。",
+	"机の上を、十秒だけ整頓しろ。",
+],
+
+  random:[
+	"水をひと口。頭の熱を冷ませ。",
+	"いい流れだ。静かに続けよう。",
+	"姿勢を直せ。肩を軽く引き、首を解せ。",
+	"……ここは静かでいいな。続けよう。",
+	"思考が絡んだら、作業を箇条書きに落とせ。",
+	"余計な完璧を捨てろ。粗く、早く、後で直す。",
+	"よく耐えている。",
+	"……静かだな。悪くない。",
+	"無駄な努力など無い。怠けるより遥かにましだ。",
+	"集中の途切れは自然なことだ。戻ればいい。",
+  	"小さな区切りを作れ。それが継続の鍵だ。",
+ 	"完璧を狙うな。まずは粗く整えよ。",
+  	"今やるべきことだけを見ろ。枝葉は後で払え。",
+ 	"五分だけ続けてみろ。それで変わることもある。",
+ 	"やる気は待つものではない。動けば出る。",
+ 	"疲れたなら、姿勢を変えろ。血が巡れば思考も回る。",
+ 	"進まぬ時は、書く順を変えてみるといい。",
+  	"作業を小さく区切れ。区切りが見えるだけで動ける。",
+  	"机の上を整えるだけでも、頭が動き出す。",
+  	"判断は後でいい。今は材料を並べる段だ。",
+  	"考えが詰まったなら、目線を少し上げろ。",
+  	"作業を眺めているだけでは何も変わらぬ。小さく始めよ。",
+  	"止まることを恐れるな。再起の力を鍛えればいい。",
+  	"やる気が無い日ほど、形だけでも始めろ。それで十分だ。",
+  	"今は量を積め。質は後で磨けばいい。",
+  	"順番を変えるだけで、思考は意外と動く。",
+  	"小さな成功を拾え。脳は報酬を求めている。",
+  	"少し背筋を伸ばせ。怠けは姿勢から始まる。",
+  	"結果ではなく流れを作れ。今日の勝ちはそこだ。",
+  	"気乗りしなくても、やっている自分を褒めておけ。",
+  	"何も進まぬ時間も、土台の一つだ。",
+  	"一度区切れば、また戻りやすくなる。中断を恐れるな。",
+  	"進捗が遅くても構わぬ。動き続けているなら、それで良い。",
+  	"考えを止めるな。たとえ形にならずとも意味はある。",
+  	"やることを減らせば、迷いも減る。単純でいい。",
+	"雑にでも書いてみろ。形ができれば、磨ける。",
+	"考えがまとまらなくとも、手は動かせるはずだ。",
+	"全体など見なくていい。目の前の一点に集中しろ。",
+	"まだ整っていなくて構わぬ。まず吐き出せ。",
+	"完璧を目指すな、進行を止めるだけだ。",
+	"進まぬ時は、視点を変えろ。己を疑え。",
+	"集中とは、意志ではなく習慣だ。",
+	"怠惰か迷いか、それを自覚するだけで一歩進んでいる。",
+	"面倒と感じる作業ほど、後の助けになる。",
+	"書き直しを恐れるな。最初の形など仮のものだ。",
+	"行き詰まりは悪くない。停滞こそ敵だ。",
+	"書く手が鈍ったなら、目的を一言で言ってみろ。",
+	"無理にでも続けると、ある瞬間、霧が晴れる。",
+	"細部に沈むな。ときに荒く、大胆に進め。",
+	"今は量を積め。質の追求は後でいい。",
+	"雑でもいい。空白のままより百倍ましだ。",
+	"気が散るなら、何に反応しているか観察してみろ。",
+	"習慣は救いになる。迷った時に支えてくれる。",
+	"一歩ずつだ。全てを一度でやろうとするな。",
+	"道筋が見えぬなら、先に小さな成果を一つ作れ。",
+	"今日の出来は問わぬ。続けた事実だけが力となる。",
+	"姿勢を正せ。気も整う。"
+
+],
+
+  chime:[
+	"刻の報せだ。ここで区切ってもいい。",
+	"一時間が過ぎた。進んでも、休んでも構わん。",
+	"一刻が過ぎた。手を止めて振り返れ。",
+	"……もうこんな時刻か。",
+	"過ぎた時間は戻らぬ。だからこそ貴い。",
+	"よくここまで持ったな。",
+	"さて、続けるか、それとも締めるか。",
+	"一刻だ。区切るか、続けるか、選べ。",
+],
+
+  idle:[
+	"息を吸って、四つ。吐いて、また四つ。戻って来い。",
+	"疲れたか。窓を少し開けて、戻れ。"],
+
+  end:[
+	"一区切りだ。よく持った。",
+	"灯を落とそう。続きはまただ。",
+	"灯を落とす時刻だ。",
+	"今日の働き、悪くない。",
+	"ここで止めるのも英断だ。",
+	"灯を絶やすな。明日も続きがある。",
+	"……よくやった。"],
+
+  pause:[
+	"休むのも技だ。体勢を整えろ。",
+	"目を閉じろ。肩を一度、落とせ。",
+	"少し休め。張りつめた糸は切れやすい。",
+	"水でも飲んでこい。",
+	"呼吸を整えろ。焦りは毒だ。",
+	"中断もまた策のうちだ。",
+	"少し手を休めるのも悪くない。",
+	 "…ふむ。茶でも淹れるか。貴殿も喉を潤すといい。",
+ 	 "……この間、倉の奥から古い巻物が出てな。読みふけって気づけば夜が明けていた。",
+ 	 "こうして黙って座っている時間も、案外悪くないものだ。",
+ 	 "……昔、御方が『お前は黙っていても睨んでいるようだ』と笑われたことがある。……否定はせぬ。",
+	 "風が変わってきたな。……貴殿の部屋にも届いているか？",
+ 	 "御方が子供の頃、書見の合間に栗をつまんでおられた。……今でもお好きだ。",
+ 	 "何もせずに座っていると、妙に昔のことを思い出す。……貴殿もそうか？",
+ 	 "少し休め。机から離れて深呼吸しろ。",
+ 	 "ふむ……ここで区切るのも悪くない。",
+ 	 "肩を回せ。固まったままでは考えも鈍る。",
+ 	 "風の音がするな。少し窓を開けてみろ。",
+ 	 "この静けさも悪くない。灯だけが揺れている。",
+	 "やれやれ、ようやく一息か。",
+ 	 "……眠くなったか？少し目を閉じてもいい。",
+ 	 "今のうちに背を伸ばせ。呼吸が通るだけで違う。",
+	 "焦っても仕方がない。火を絶やさなければ良いだけだ。",
+ 	 "一息ついたら、また戻ればいい。それだけのことだ。",
+ 	 "外の空気を吸ってこい。五分でいい。",
+ 	 "このまま夜を越すのも悪くはないが…ほどほどにな。"
+],
+
+
+  resume:[
+	"戻ったか。……よし、続けよう。",
+	"席に戻れたな。十分だ。",
+	"戻ったか。",
+	"続きをやる気になったか、良い兆しだ。",
+	"途切れた流れを戻すのは骨が折れるな。……だができる。",
+	"さあ、もう一度始めるぞ。",
+ 	"戻ったか。……では、続きを始めよう。",
+	"次の一手だな。",
+ 	"再開か。",
+  	"さあ、火はまだ消えていない。",
+  	"一息入れたか？ では、作業に戻るぞ。",
+  	"戻ったか。…私も少し考えていた。",
+  	"よし、続きを詰めよう。まだ策の余地はある。",
+ 	"さて……灯が再び揺れ始めたぞ。",
+ 	"再び筆を執るか。ならば、私も傍に立とう。",
+  	"戻ってきたか。ふふ、やはり捨ててはおけぬな。",
+  	"戻ったか。気分は整ったか？",
+  	"よし、続けよう。途切れた流れを繋げばいい。",
+  	"頭を切り替えろ。手を動かせば思考も戻る。",
+  	"休むのは悪くない。戻ってきたなら上出来だ。",
+ 	"静かに集中を戻せ。焦らず、確実に。",
+ 	"待っていた。次の手を見せてもらおうか。",
+ 	"さて、続きを片付けよう。途中で放り出すには惜しい。",
+  	"少し顔つきが変わったな。良い兆しだ。",
+  	"気持ちが鈍る前に、また火を入れよう。",
+  	"休息は終わりだ。再び、積み上げの時間だ。",
+  	"次は少し速くいこうか。勢いが残っているうちに。",
+  	"もう迷いは要らぬ。次の手を打て。",
+  	"さあ、続きをやろう。言葉より行動だ。"
+]
+
+};
+
+/* iOSのポリシーを満たすため、無音のバッファを再生してAudioContextをUnlockする */ 
+function initAudio(){
+    if(!audioCtx){
+        audioCtx=new (window.AudioContext||window.webkitAudioContext)(); 
+        const buffer=audioCtx.createBuffer(1,1,audioCtx.sampleRate);
+        const source=audioCtx.createBufferSource(); source.buffer=buffer;
+        source.connect(audioCtx.destination); source.start(0); 
+    }
+} 
+
+/* ===== audio (鐘) ===== */
+let audioCtx=null;
+function bell(){
+  try{
+    if(!audioCtx)initAudio();  
+    const t = audioCtx.currentTime;
+    const baseFreq = 1600 + Math.random()*200; 
+    const o1 = audioCtx.createOscillator(), g1 = audioCtx.createGain();
+    const o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
+    o1.type = "sine"; 
+    o2.type = "triangle";
+    o1.frequency.setValueAtTime(baseFreq, t);
+    o2.frequency.setValueAtTime(baseFreq * 1.995, t); 
+    g1.gain.setValueAtTime(0.0001, t);
+    g1.gain.exponentialRampToValueAtTime(0.08, t + 0.02);
+    g1.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+    g2.gain.setValueAtTime(0.0001, t);
+    g2.gain.exponentialRampToValueAtTime(0.04, t + 0.05);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t + 1.3);
+    
+    o1.connect(g1).connect(audioCtx.destination);
+    o2.connect(g2).connect(audioCtx.destination);
+    
+    // 🔔 修正点：o1とo2を同時に開始・停止させる
+    o1.start(t); o1.stop(t + 1.6);
+    o2.start(t); o2.stop(t + 1.4); 
+    
+    // 🗑️ メモリ解放処理はここで完結させる
+    o1.onended = () => { 
+        o1.disconnect();
+        o2.disconnect();
+    };
+
+  }catch(e){/* 失敗しても無視 */}
+}
+
+function endBell(){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const t = audioCtx.currentTime;
+    const baseFreq = 700 + Math.random()*50; // 低め
+    const o1 = audioCtx.createOscillator(), g1 = audioCtx.createGain();
+    o1.type = "sine";
+    o1.frequency.setValueAtTime(baseFreq, t);
+    g1.gain.setValueAtTime(0.0001, t);
+    g1.gain.exponentialRampToValueAtTime(0.2, t + 0.05);
+    g1.gain.exponentialRampToValueAtTime(0.0001, t + 3.0); // 余韻長め
+    o1.connect(g1).connect(audioCtx.destination);
+    o1.start(t); o1.stop(t + 3.2);
+  }catch(e){}
+}
+
+
+
+/* ===== speech: ノベル風（すべてtypewriter化） ===== */
+let typing=false, queue=[];
+function say(text){
+  if(typing){queue.push(text);torchBoost();return}
+  typing=true; torchBoost();
+  const el=$("#bubble"); el.innerHTML="<p></p>"; const p=el.querySelector("p");
+  const sp=50; let i=0;
+  (function type(){
+    if(i === 0) {
+        bell(); // 最初のループ実行時 (i=0) に音を鳴らす
+    }
+    if(i<text.length){ 
+       p.textContent+=text[i++]; setTimeout(type,sp) } else {
+       typing=false; if(queue.length){ say(queue.shift()) }
+    }})();
+  }
+
+/* ===== timers ===== */
+function updateElapsed(){
+  if(!startTime){$("#counter").textContent="00:00:00";$("#statElapsed").textContent="00:00:00";return}
+  const ms=Date.now()-startTime.getTime(),s=dur(ms);
+  $("#counter").textContent=s; $("#statElapsed").textContent=s;
+  if(pomoMinutes>0){const left=Math.max(0,pomoMinutes*60*1000-ms);$("#remain").textContent=left>0?dur(left):"00:00:00";if(left<=0) stopSession(true)}
+  else{$("#remain").textContent="—"}
+}
+function scheduleTick(){clearInterval(tickId);tickId=setInterval(updateElapsed,1000)}
+function scheduleRandomTalk(){
+  clearTimeout(randId);
+  const min = Math.max(3, parseInt($("#minGap").value||"3",10)); // 下限（UIで調整）
+  const upper = 10;                                           // 上限固定
+  const gap = (min + Math.random() * (upper - min)) * 60 * 1000; // 3〜10分
+  randId = setTimeout(()=>{ if(currentState==='running'){ say(pick(messages.random)); scheduleRandomTalk(); } }, gap);
+}
+function scheduleChime() {
+  clearTimeout(chimeId);
+  const n = new Date();
+  const nx = new Date(n.getFullYear(), n.getMonth(), n.getDate(), n.getHours() + 1, 0, 0, 0);
+  const gap = nx - n;
+
+  chimeId = setTimeout(() => {
+    if (currentState === 'running') {
+      say(pick(messages.chime));          // ① 時報メッセージ表示
+      clearTimeout(resumeId);
+      const delay = 5000 + Math.random() * 5000; // ② 5〜10秒後
+      resumeId = setTimeout(() => {
+        if (currentState === 'running') {
+          say(pick(messages.random));     // ③ ランダム発話
+        }
+      }, delay);
+    }
+    scheduleChime(); // 次の時報スケジュール
+  }, gap);
+}
+
+["mousemove","keydown","mousedown","touchstart","wheel"].forEach(ev=>window.addEventListener(ev,()=>{lastInputTime=Date.now()}));
+function scheduleIdleWatch(){clearInterval(idleId);idleId=setInterval(()=>{if(currentState==='running'&&Date.now()-lastInputTime>10*60*1000){say(pick(messages.idle));lastInputTime=Date.now()}},30*1000)}
+
+/* ===== logs ===== */
+const storeKey="doza.logs.v1";
+function loadLogs(){try{return JSON.parse(localStorage.getItem(storeKey)||"[]")}catch{return[]}}
+function saveLogs(a){localStorage.setItem(storeKey,JSON.stringify(a))}
+function addLog(e){const l=loadLogs();l.push(e);saveLogs(l);renderLogs()}
+function clearLogs(){localStorage.setItem(storeKey,"[]");renderLogs()}
+function renderLogs(){
+  const logs=loadLogs(),tb=$("#logTable tbody");tb.innerHTML="";let today=0;
+  logs.slice().reverse().forEach((e,i)=>{const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${e.task||"(無題)"}</td><td>${e.startHM}</td><td>${e.endHM}</td><td>${e.durHM}</td>
+    <td><button class="delBtn" data-i="${i}">削除</button></td>`;tb.appendChild(tr);if(e.date===todayKey())today+=e.ms});
+  $("#todaySum").textContent=`本日の合計：${durMM(today)}`
+}
+renderLogs();
+$("#logTable").addEventListener("click",e=>{const b=e.target.closest(".delBtn");if(!b)return;const idx=+b.dataset.i;
+  if(confirm("この記録を削除する。よいな？")){const logs=loadLogs();const real=logs.length-1-idx;logs.splice(real,1);saveLogs(logs);renderLogs()}})
+$("#clearBtn").onclick=()=>{if(confirm("すべての作業ログを削除する。よいな？"))clearLogs()}
+$("#csvBtn").onclick=()=>{const logs=loadLogs(),rows=[["date","task","start","end","minutes"]];logs.forEach(e=>rows.push([e.date,e.task,e.startHM,e.endHM,Math.round(e.ms/60000)]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\r\n");const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));a.download="doza_logs.csv";a.click()}
+
+/* ===== session ===== */
+function startSession(){ initAudio(); 
+  const task=$("#taskInput").value.trim();$("#taskName").textContent=task||"未設定";
+  startTime=new Date();$("#startAt").textContent=fmtHM(startTime);$("#statStart").textContent=fmtHM(startTime);
+  $("#counter").textContent="00:00:00";$("#statElapsed").textContent="00:00:00";
+  running=true;paused=false;currentState='running';
+  $("#startBtn").disabled=true;$("#pauseBtn").disabled=false;$("#stopBtn").disabled=false;
+  pomoMinutes=Math.max(0,parseInt($("#pomo").value||"0",10));
+  closeDrawer();scheduleTick();scheduleRandomTalk();scheduleChime();scheduleIdleWatch();
+  say(pick(messages.start));updateElapsed();
+  const delay = 5000 + Math.random() * 5000; // 5〜10秒後にランダム発話
+  setTimeout(() => {
+   if (currentState === 'running') {
+   say(pick(messages.random));
+  }
+}, delay);
+
+}
+function pauseSession(){
+  if(currentState!=='running')return;
+  paused=true;currentState='paused';
+  clearInterval(tickId);clearTimeout(randId);clearTimeout(chimeId);clearTimeout(resumeId);clearInterval(idleId);
+  say(pick(messages.pause)); $("#pauseBtn").textContent="再開";
+}
+function resumeSession(){
+  if(currentState!=='paused')return;
+  paused=false;currentState='resuming';
+  scheduleTick(); scheduleIdleWatch();
+  say(pick(messages.resume)); // タイピング表示
+  clearTimeout(resumeId);
+  const delay=5000+Math.random()*5000; // 5〜10秒後にランダム発話
+  resumeId=setTimeout(()=>{
+    say(pick(messages.random));
+    currentState='running';
+    scheduleRandomTalk(); scheduleChime();
+  }, delay);
+  $("#pauseBtn").textContent="一時停止";
+}
+function stopSession(byPomo=false){
+  if(currentState==='idle')return;
+  clearInterval(tickId);clearTimeout(randId);clearTimeout(chimeId);clearInterval(idleId);clearTimeout(resumeId);
+  running=false;paused=false;currentState='idle';
+  $("#startBtn").disabled=false;$("#pauseBtn").disabled=true;$("#stopBtn").disabled=true;$("#pauseBtn").textContent="一時停止";
+  const end=new Date();const ms=startTime?(end-startTime):0;
+  if(ms>1000){addLog({date:todayKey(startTime),task:$("#taskInput").value.trim(),startHM:fmtHM(startTime),endHM:fmtHM(end),durHM:durMM(ms),ms})}
+  say(byPomo?"鐘が鳴った。ここで区切ろう。":pick(messages.end));startTime=null;updateElapsed(); openDrawer();
+}
+
+/* ===== 背景：火の粉生成 ===== */
+(function spawnSparks(){
+  const box=$("#sparks"), N=30;
+  box.innerHTML="";
+  for(let i=0;i<N;i++){
+    const s=document.createElement("div"); s.className="spark";
+　　// 出現位置
+    s.style.left = (5 + Math.random()*70) + "%";
+    s.style.bottom = (Math.random()*25) + "%";
+
+　　// 個別の流れ方向（右 or 左）
+    const dir = (Math.random() < 0.5 ? -1 : 1);
+    const drift = 40 + Math.random()*60; // 横方向の流れ量（40〜100px）
+
+    // カスタムプロパティで方向を渡す
+    s.style.setProperty("--driftX", dir * drift + "px");
+　　
+    s.style.transform = `scale(${0.4 + Math.random()*0.8})`; // 粒のサイズ差をつける
+
+    s.style.animationDelay = (Math.random()*8)+"s";
+    s.style.opacity = (0.25 + Math.random()*0.55);
+    box.appendChild(s);
+  }
+})();
+
+/* ===== 灯（ver.4.1：静＋発話時ブースト） ===== */
+const TORCH_CFG={baseParticles:92,boostParticles:28,driftAmpX:12,driftAmpY:12,driftSpeed:0.0006,baseHue:34,hueJitter:14,
+  sizeMin:1.1,sizeMax:3.0,speedMin:0.08,speedMax:0.34,lifeMin:2.0,lifeMax:5.2,swirl:0.6,rise:0.15,breathAmpBase:0.09,breathAmpBoost:0.14,maxBrightBoost:0.55,targetFPS:45};
+(function torch(){
+  const c=$("#torch");const dpr=window.devicePixelRatio||1;const W=c.width,H=c.height;c.width=W*dpr;c.height=H*dpr;c.style.width=W+"px";c.style.height=H+"px";
+  const ctx=c.getContext("2d",{alpha:true});ctx.scale(dpr,dpr);
+  const TWO=Math.PI*2;let last=performance.now();const minDT=1000/TORCH_CFG.targetFPS;
+  const driftPX=Math.random()*TWO,driftPY=Math.random()*TWO;
+  let boost=0;window.torchBoost=()=>{boost=Math.min(1.0,boost+0.9)};
+  const parts=[];
+  function spawn(cx,cy,short=false){
+    const a=Math.random()*TWO,r=Math.random()*18;
+    parts.push({x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r+10,vx:(Math.random()-.5)*TORCH_CFG.swirl,vy:-TORCH_CFG.rise-Math.random()*TORCH_CFG.rise*0.2,
+      size:TORCH_CFG.sizeMin+Math.random()*(TORCH_CFG.sizeMax-TORCH_CFG.sizeMin),life:0,
+      maxLife:((short?TORCH_CFG.lifeMin*0.6:TORCH_CFG.lifeMin)+Math.random()*((short?TORCH_CFG.lifeMax*0.7:TORCH_CFG.lifeMax)-TORCH_CFG.lifeMin))*1000,
+      hue:TORCH_CFG.baseHue+(Math.random()*TORCH_CFG.hueJitter*2-TORCH_CFG.hueJitter),seed:Math.random()*1000,half:Math.random()<0.45})
+  }
+  for(let i=0;i<TORCH_CFG.baseParticles;i++)spawn(W/2,H/2);
+  function coreGrad(x,y,r,h,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,`hsla(${h-3},90%,95%,${0.85+a*0.12})`);
+    g.addColorStop(.35,`hsla(${h+6},94%,68%,${0.62+a*0.12})`);
+    g.addColorStop(1,`hsla(${h+12},98%,55%,${0.22+a*0.10})`);return g}
+  function loop(t){
+    const dt=t-last;if(dt<minDT){requestAnimationFrame(loop);return}last=t;ctx.clearRect(0,0,W,H);
+    const cx=W/2+Math.sin(t*TORCH_CFG.driftSpeed+driftPX)*TORCH_CFG.driftAmpX*(1+boost*0.15);
+    const cy=H/2+Math.cos(t*TORCH_CFG.driftSpeed*1.1+driftPY)*TORCH_CFG.driftAmpY*(1+boost*0.15);
+    const breathAmp=boost>0.1?TORCH_CFG.breathAmpBoost:TORCH_CFG.breathAmpBase;
+    const breath=1+Math.sin(t/(boost>0.1?1000:1400))*breathAmp;
+    const target=TORCH_CFG.baseParticles+Math.round(boost*TORCH_CFG.boostParticles);
+    while(parts.length<target)spawn(cx,cy,boost>0.3);
+    boost=Math.max(0,boost-dt/2500);
+    ctx.globalCompositeOperation="lighter";
+    const bgR=56*breath*(1+boost*0.3),g=ctx.createRadialGradient(cx,cy+14,0,cx,cy+14,bgR);
+    g.addColorStop(0,`rgba(255,235,200,${0.10+boost*0.06})`);g.addColorStop(1,"rgba(255,156,61,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy+14,bgR,0,TWO);ctx.fill();
+    for(let i=0;i<parts.length;i++){
+      const p=parts[i];p.life+=dt;if(p.life>p.maxLife||p.y<18||p.x<6||p.x>W-6){parts[i]=parts[parts.length-1];parts.pop();i--;continue}
+      if(!(p.half&&(Math.floor(t/1000*TORCH_CFG.targetFPS)%2))){
+        const dx=cx-p.x,dy=cy-p.y,dist=Math.hypot(dx,dy)+1e-3;const k=1+boost*0.6;
+        p.vx+=(dx/dist)*0.002*k; p.vy+=(dy/dist)*0.001*k;
+        const swirlK=1+boost*0.5; const n=Math.sin((t+p.seed)/900);
+        p.vx+=n*0.003*swirlK; p.vy+=-TORCH_CFG.rise*0.6*k;
+        const vmax=TORCH_CFG.speedMax*(1+boost*0.5),sp=Math.hypot(p.vx,p.vy);
+        if(sp>vmax){p.vx*=vmax/sp;p.vy*=vmax/sp}
+        p.x+=p.vx; p.y+=p.vy;
+      }
+      const k2=p.life/p.maxLife,h=p.hue+k2*10,a=boost*TORCH_CFG.maxBrightBoost,sz=1+a*0.3,r=p.size*6*breath*sz;
+      ctx.fillStyle=coreGrad(p.x,p.y,r,h,a);ctx.beginPath();ctx.arc(p.x,p.y,p.size*breath*sz,0,TWO);ctx.fill();
+      if(Math.random()<0.009+boost*0.01){ctx.fillStyle=`hsla(${h},100%,82%,${0.6+a*0.3})`;ctx.beginPath();ctx.arc(p.x,p.y,(p.size+1.6)*breath*sz,0,TWO);ctx.fill()}
+    }
+    if(parts.length>target)parts.length=Math.max(target,parts.length-1);
+    requestAnimationFrame(loop)
+  }
+  requestAnimationFrame(loop)
+})();
+
+/* ===== controls ===== */
+$("#startBtn").onclick=startSession;
+$("#pauseBtn").onclick=()=> currentState==='paused'?resumeSession():pauseSession();
+$("#stopBtn").onclick=()=>stopSession(false);
+
+
+/* Service Worker 登録の追加 */
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: './' }) .then((reg) => { console.log('Service Worker registered: ', reg); }) .catch((err) => { console.log('Service Worker registration failed: ', err); }); }); }
+
+
+/* init */
+$("#counter").textContent="00:00:00";
+$("#taskInput").value="";
+$("#remain").textContent="—";
+renderLogs();
+</script>
+</body>
+</html>
