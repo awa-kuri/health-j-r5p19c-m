@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>健康記録</title>
+
+
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png"> 
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #111827;
+            color: #e5e7eb;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: #9ca3af;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #e5e7eb;
+            border-bottom-color: #9ca3af;
+        }
+
+        .tab:hover {
+            color: #9ca3af;
+        }
+
+        .content {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            min-height: 400px;
+        }
+
+        .panel {
+            display: none;
+            padding: 30px;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            color: #e5e7eb;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4b5563;
+        }
+
+        .form-input::placeholder {
+            color: #4b5563;
+        }
+
+/* 日付入力欄のスタイル修正 */
+.form-input[type="date"] {
+    /* ブラウザのデフォルトUI（カレンダーアイコンなど）の幅を考慮し、幅を確保 */
+    width: 100%; 
+    /* iOS Safariなどのデフォルト設定をリセットし、テキストの色を統一 */
+    -webkit-appearance: none;
+    appearance: none;
+}
+/* カレンダーアイコン部分のスタイルも修正する場合 */
+.form-input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8); /* アイコンを明るくして見やすくする */
+}
+
+        textarea.form-input {
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .exercise-section {
+            border-top: 1px solid #374151;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+
+        .exercise-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .exercise-list {
+            margin-top: 15px;
+        }
+
+        .exercise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .exercise-item-text {
+            font-size: 13px;
+            color: #d1d5db;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            color: #e5e7eb;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:hover {
+            background-color: #374151;
+        }
+
+        .btn-primary {
+            background-color: #374151;
+        }
+
+        .btn-primary:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .btn-icon:hover {
+            color: #9ca3af;
+        }
+
+        .btn-danger:hover {
+            color: #ef4444;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        .record-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .record-item {
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .record-date {
+            font-size: 16px;
+            font-weight: 300;
+            color: #d1d5db;
+        }
+
+        .record-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .record-section {
+            margin-bottom: 12px;
+        }
+
+        .record-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .record-section-title {
+            font-size: 11px;
+            color: #4b5563;
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .record-section-content {
+            font-size: 13px;
+            color: #9ca3af;
+            padding-left: 12px;
+            white-space: pre-wrap;
+        }
+
+        .record-metrics {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #4b5563;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 20, 30, 0.94);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            border-radius: 4px;
+            padding: 15px 30px;
+            color: #ff6b6b; /* 赤寄りの珊瑚色文字 */
+            box-shadow: 0 4px 12px rgba(255, 0, 0, .25);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .message.show {
+            opacity: 1;
+        }
+
+        .edit-notice {
+            background-color: #1e3a5f;
+            border: 1px solid #2563eb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #93c5fd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-section {
+            border-top: 1px solid #374151;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+
+        .data-section-title {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 15px;
+            letter-spacing: 0.05em;
+        }
+
+        .data-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercise-input-row {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .data-buttons {
+                flex-direction: column;
+            }
+
+            .data-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    // ============== 【認証設定エリア：ここだけ編集する】 ==============
+    // 貴殿の秘密の認証キーを設定する。
+    const SECRET_KEY = "1122"; 
+
+    // エラーメッセージを設定する。
+    const ACCESS_DENIED_MESSAGE = `
+        <h1>アクセスが拒否されました。</h1>
+        <p>正しい認証キーを入力してください。</p>
+        <p>ツールのご利用には、認証キーによる確認が必要です。</p>
+    `;
+    // ==========================================================
+
+
+    // ツール本体（<body>タグ内の内容）を保護するメイン処理
+    document.addEventListener('DOMContentLoaded', function() {
+        // パスワード入力を求めるダイアログを表示
+        const enteredKey = prompt("認証キーを入力してください:");
+
+        // 認証チェック
+        if (enteredKey !== SECRET_KEY) {
+            // 認証失敗時：<body>タグの中身を全て消去し、拒否メッセージに置き換える
+            document.body.innerHTML = ACCESS_DENIED_MESSAGE;
+            
+            // 重要な点: 認証失敗後は、その後の全てのJavaScriptの実行を停止する
+            throw new Error("認証失敗により処理を中断しました。"); 
+        }
+
+        // 認証成功時：何もしない（ツール本体の表示とJSの実行が続行される）
+        console.log("認証成功。ツールへのアクセスを許可します。");
+    });
+</script>
+
+
+
+    <div class="container">
+        <div class="header">
+            <h1>health-journal</h1>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('input')">入力</button>
+            <button class="tab" onclick="switchTab('list')">一覧</button>
+        </div>
+
+        <div class="content">
+            <div id="input-panel" class="panel active">
+                <div id="edit-notice" class="edit-notice" style="display: none;">
+                    <span id="edit-date"></span>
+                    <button class="btn-icon" onclick="cancelEdit()">✕</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">日付</label>
+                    <input type="date" id="input-date" class="form-input">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">体重 (kg)</label>
+                        <input type="number" step="0.1" id="input-weight" class="form-input" placeholder="52.7">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">体脂肪率 (%)</label>
+                        <input type="number" step="0.1" id="input-bodyfat" class="form-input" placeholder="25.3">
+                    </div>
+                </div>
+
+                <div class="exercise-section">
+                    <label class="form-label">運動</label>
+                    
+                    <div class="grid-2" style="margin-bottom: 10px;">
+                        <select id="exercise-category" class="form-input">
+                            <option>筋トレ</option>
+                            <option>ストレッチ</option>
+                            <option>ヨガ</option>
+                            <option>有酸素運動</option>
+                            <option>HIIT</option>
+                            <option>その他</option>
+                        </select>
+                        <select id="exercise-part" class="form-input">
+                            <option>尻</option>
+                            <option>大腿四頭筋</option>
+                            <option>ハムストリングス</option>
+                            <option>コア</option>
+                            <option>上半身</option>
+                            <option>下半身</option>
+                            <option>全身</option>
+                        </select>
+                    </div>
+
+                    <input type="text" id="exercise-menu" class="form-input" placeholder="メニュー名" style="margin-bottom: 10px;">
+                    
+                    <div class="exercise-input-row">
+                        <input type="number" id="exercise-duration" class="form-input" placeholder="時間(分)" style="flex: 1;">
+                        <button class="btn btn-small" onclick="addExercise()">追加</button>
+                    </div>
+
+                    <div id="exercise-list" class="exercise-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">食事</label>
+                    <textarea id="input-meals" class="form-input" rows="3" placeholder="朝：ゆで卵、プロテイン"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">体調</label>
+                    <textarea id="input-condition" class="form-input" rows="2" placeholder="浮腫み、疲労感など"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="saveDraft()">下書き保存</button>
+                    <button class="btn btn-primary" onclick="saveRecord()">記録を保存</button>
+                </div>
+            </div>
+
+            <div id="list-panel" class="panel">
+                <div id="record-list" class="record-list"></div>
+
+                <div class="data-section">
+                    <div class="data-section-title">データ管理</div>
+                    <div class="data-buttons">
+                        <button class="btn" onclick="exportData()">データを書き出す</button>
+                        <button class="btn" onclick="document.getElementById('import-file').click()">データを読み込む</button>
+                        <input type="file" id="import-file" class="file-input" accept=".json" onchange="importData(event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        let currentDraft = null;
+        let exercises = [];
+        let editingDate = null;
+
+        const messages = [
+            "今日も記録した。また明日だ",
+            "よく続けている。",
+            "今日も積み重ねたな。",
+            "一歩ずつ、進んでいる。",
+            "記録は残る。積み重なっていく。",
+            "今日もここまで来た。",
+            "明日もまた、ここに戻ってこい。",
+            "今日の一手、確かに刻んだ。",
+            "ここに記したなら、それで十分だ。",
+            "継続の火は消えていない。今日も守り切った。",
+            "小さな一歩で構わん。止まらなかったことを誇れ。"
+        ];
+
+        function getJSTDate() {
+            const now = new Date();
+            const jstDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+            const year = jstDate.getFullYear();
+            const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+            const day = String(jstDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function init() {
+            document.getElementById('input-date').value = getJSTDate();
+            loadDraft();
+            renderRecordList();
+        }
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem('healthDraft');
+            if (savedDraft) {
+                const draft = JSON.parse(savedDraft);
+                if (draft.date === getJSTDate()) {
+                    applyDraft(draft);
+                } else {
+                    localStorage.removeItem('healthDraft');
+                }
+            }
+        }
+
+        function applyDraft(draft) {
+            document.getElementById('input-date').value = draft.date || getJSTDate();
+            document.getElementById('input-weight').value = draft.weight || '';
+            document.getElementById('input-bodyfat').value = draft.bodyFat || '';
+            document.getElementById('input-meals').value = draft.meals || '';
+            document.getElementById('input-condition').value = draft.condition || '';
+            exercises = draft.exercises || [];
+            renderExerciseList();
+        }
+
+        function getCurrentInput() {
+            return {
+                date: document.getElementById('input-date').value,
+                weight: document.getElementById('input-weight').value,
+                bodyFat: document.getElementById('input-bodyfat').value,
+                exercises: exercises,
+                meals: document.getElementById('input-meals').value,
+                condition: document.getElementById('input-condition').value
+            };
+        }
+
+        function saveDraft() {
+            const draft = getCurrentInput();
+            localStorage.setItem('healthDraft', JSON.stringify(draft));
+            showMessage('下書きを保存した。');
+        }
+
+        function saveRecord() {
+            const record = getCurrentInput();
+            if (!record.date) {
+                showMessage('日付が入力されていない。');
+                return;
+            }
+
+            let records = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+            const existingIndex = records.findIndex(r => r.date === record.date);
+
+            if (existingIndex >= 0) {
+                records[existingIndex] = record;
+            } else {
+                records.push(record);
+            }
+
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            localStorage.setItem('healthRecords', JSON.stringify(records));
+            localStorage.removeItem('healthDraft');
+
+            clearInput();
+            renderRecordList();
+            switchTab('list');
+
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            showMessage(randomMessage);
+        }
+
+        function clearInput() {
+            document.getElementById('input-date').value = getJSTDate();
+            document.getElementById('input-weight').value = '';
+            document.getElementById('input-bodyfat').value = '';
+            document.getElementById('input-meals').value = '';
+            document.getElementById('input-condition').value = '';
+            exercises = [];
+            renderExerciseList();
+            editingDate = null;
+            document.getElementById('edit-notice').style.display = 'none';
+        }
+
+        function addExercise() {
+            const category = document.getElementById('exercise-category').value;
+            const part = document.getElementById('exercise-part').value;
+            const menu = document.getElementById('exercise-menu').value;
+            const duration = document.getElementById('exercise-duration').value;
+
+            if (!menu || !duration) {
+                showMessage('メニュー名と時間が未入力だ。');
+                return;
+            }
+
+            exercises.push({ category, part, menu, duration });
+            document.getElementById('exercise-menu').value = '';
+            document.getElementById('exercise-duration').value = '';
+            renderExerciseList();
+        }
+
+        function removeExercise(index) {
+            exercises.splice(index, 1);
+            renderExerciseList();
+        }
+
+        function renderExerciseList() {
+            const container = document.getElementById('exercise-list');
+            if (exercises.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = exercises.map((ex, idx) => `
+                <div class="exercise-item">
+                    <span class="exercise-item-text">${ex.category} · ${ex.part} · ${ex.menu} · ${ex.duration}分</span>
+                    <button class="btn-icon btn-danger" onclick="removeExercise(${idx})">🗑</button>
+                </div>
+            `).join('');
+        }
+
+        function startEdit(date) {
+            const records = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+            const record = records.find(r => r.date === date);
+            if (record) {
+                applyDraft(record);
+                editingDate = date;
+                document.getElementById('edit-notice').style.display = 'flex';
+                document.getElementById('edit-date').textContent = `${date} の記録を編集中`;
+                switchTab('input');
+            }
+        }
+
+        function cancelEdit() {
+            clearInput();
+            loadDraft();
+        }
+
+        function deleteRecord(date) {
+            if (!confirm(`${date} の記録を削除しますか?`)) return;
+
+            let records = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+            records = records.filter(r => r.date !== date);
+            localStorage.setItem('healthRecords', JSON.stringify(records));
+            renderRecordList();
+            showMessage('記録を削除した。');
+        }
+
+        function renderRecordList() {
+            const records = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+            const container = document.getElementById('record-list');
+
+            if (records.length === 0) {
+                container.innerHTML = '<div class="empty-state">記録なし</div>';
+                return;
+            }
+
+            container.innerHTML = records.map(record => `
+                <div class="record-item">
+                    <div class="record-header">
+                        <div class="record-date">${record.date}</div>
+                        <div class="record-actions">
+                            <button class="btn-icon" onclick="startEdit('${record.date}')">✏️</button>
+                            <button class="btn-icon btn-danger" onclick="deleteRecord('${record.date}')">🗑</button>
+                        </div>
+                    </div>
+
+                    ${record.weight || record.bodyFat ? `
+                        <div class="record-metrics">
+                            ${record.weight ? `<div>体重 ${record.weight} kg</div>` : ''}
+                            ${record.bodyFat ? `<div>体脂肪率 ${record.bodyFat}%</div>` : ''}
+                        </div>
+                    ` : ''}
+
+                    ${record.exercises && record.exercises.length > 0 ? `
+                        <div class="record-section">
+                            <div class="record-section-title">運動</div>
+                            <div class="record-section-content">${record.exercises.map(ex => `${ex.category} · ${ex.part} · ${ex.menu} · ${ex.duration}分`).join('\n')}</div>
+                        </div>
+                    ` : ''}
+
+                    ${record.meals ? `
+                        <div class="record-section">
+                            <div class="record-section-title">食事</div>
+                            <div class="record-section-content">${record.meals}</div>
+                        </div>
+                    ` : ''}
+
+                    ${record.condition ? `
+                        <div class="record-section">
+                            <div class="record-section-title">体調</div>
+                            <div class="record-section-content">${record.condition}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    if (tab.textContent === (tabName === 'input' ? '入力' : '一覧')) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
+            document.getElementById(`${tabName}-panel`).classList.add('active');
+
+            if (tabName === 'list') {
+                renderRecordList();
+            }
+        }
+
+        function exportData() {
+            const records = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+            
+            if (records.length === 0) {
+                showMessage('書き出すデータがない。');
+                return;
+            }
+
+            const data = {
+                exportDate: getJSTDate(),
+                version: '1.0',
+                records: records
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `health-records-${getJSTDate()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessage(`${records.length}件のデータを書き出した。`);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.records || !Array.isArray(data.records)) {
+                        showMessage('無効なデータ形式だ。');
+                        return;
+                    }
+
+                    const existingRecords = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+                    const existingDates = new Set(existingRecords.map(r => r.date));
+                    
+                    let addedCount = 0;
+                    let updatedCount = 0;
+
+                    data.records.forEach(record => {
+                        if (existingDates.has(record.date)) {
+                            const idx = existingRecords.findIndex(r => r.date === record.date);
+                            existingRecords[idx] = record;
+                            updatedCount++;
+                        } else {
+                            existingRecords.push(record);
+                            addedCount++;
+                        }
+                    });
+
+                    existingRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    localStorage.setItem('healthRecords', JSON.stringify(existingRecords));
+                    renderRecordList();
+
+                    if (addedCount > 0 && updatedCount > 0) {
+                        showMessage(`${addedCount}件を追加、${updatedCount}件を更新しました`);
+                    } else if (addedCount > 0) {
+                        showMessage(`${addedCount}件のデータを読み込んだ。`);
+                    } else if (updatedCount > 0) {
+                        showMessage(`${updatedCount}件のデータを更新した。`);
+                    }
+
+                } catch (error) {
+                    showMessage('…データの読み込みに失敗した。');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function showMessage(text) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.classList.add('show');
+            setTimeout(() => messageEl.classList.remove('show'), 3000);
+        }
+
+/* Service Worker 登録の追加 */
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: './' }) .then((reg) => { console.log('Service Worker registered: ', reg); }) .catch((err) => { console.log('Service Worker registration failed: ', err); }); }); }
+
+
+        init();
+    </script>
+</body>
+</html>
