@@ -1,34 +1,51 @@
-
-const CACHE_NAME = 'health-journal-cache-v1'; // キャッシュ名を変更
-const urlsToCache = [
-  './index.html', // ファイル名を修正
-  './manifest.json', // ファイル名を修正
-  './icon-192.png', 
+/* 星座盤 — Service Worker (最小限) */
+const CACHE_NAME = 'seizaban-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
   './icon-512.png',
-  // CSSファイルがindex.html内に記述されているため、ここでは追加不要
-  // JavaScriptもindex.html内に記述されているため、ここでは追加不要
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS.map((url) => cache.add(url).catch(() => null))
+      )
+    )
   );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      )
+    )
+  );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // キャッシュにあればそれを使う
-        if (response) {
-          return response;
-        }
-        // なければネットワークから取得
-        return fetch(event.request);
-      })
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && req.url.startsWith(self.location.origin)) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          }
+          return res;
+        })
+        .catch(() => cached);
+    })
   );
 });

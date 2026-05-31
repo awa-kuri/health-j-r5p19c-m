@@ -1,21 +1,27 @@
 {
-  "name": "健康記録",
-  "short_name": "health-journal",
-  "description": "日々の健康と運動の記録",
+  "name": "綴",
+  "short_name": "綴",
+  "description": "物語の記録。",
+  "lang": "ja",
+  "dir": "ltr",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#6B7280",
- 　"icons": [
-  {
-    "src": "/icon-512.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  },
-  {
-    "src": "/icon-192.png",
-    "sizes": "192x192",
-    "type": "image/png"
-  }
-]
- }
+  "orientation": "portrait",
+  "background_color": "#EFE7D6",
+  "theme_color": "#EFE7D6f,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+  ]
+}
