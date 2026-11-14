@@ -1,27 +1,16 @@
 {
   "name": "綴",
   "short_name": "綴",
-  "description": "物語の記録。",
+  "description": "夜に語られた物語を綴じて、縦書きで続けて読む本",
   "lang": "ja",
-  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#EFE7D6",
-  "theme_color": "#EFE7D6f,
+  "theme_color": "#EFE7D6",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
