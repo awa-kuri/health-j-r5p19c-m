@@ -96,11 +96,11 @@
 
   /* ========== Index (目次) ========== */
   .index-view {
-    padding: 0 28px;
+    padding: 0 22px;
   }
   .index-header {
     text-align: center;
-    padding: 36px 0 28px;
+    padding: 36px 0 24px;
   }
   .index-title {
     font-family: var(--font-mincho);
@@ -122,9 +122,99 @@
     text-align: center;
     font-size: 11px;
     color: var(--ink-mute);
-    margin-bottom: 28px;
-    letter-spacing: 0.2em;
+    margin-bottom: 26px;
+    letter-spacing: 0.25em;
+    min-height: 1em;
   }
+
+  /* 続きから */
+  .tsuzuki {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    margin-bottom: 30px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px var(--paper-shadow);
+    text-align: left;
+    transition: background 0.2s;
+  }
+  .tsuzuki:active { background: var(--bg-deep); }
+  .tsuzuki .shiori { color: var(--vermilion); flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+  .tsuzuki-text { flex: 1; min-width: 0; }
+  .tsuzuki-label {
+    display: block;
+    font-size: 11px;
+    color: var(--vermilion);
+    letter-spacing: 0.3em;
+    margin-bottom: 4px;
+  }
+  .tsuzuki-where {
+    display: block;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .tsuzuki-where .tw-vol { color: var(--ink-soft); font-weight: 300; }
+  .tsuzuki .ch-arrow { color: var(--ink-mute); flex-shrink: 0; }
+
+  /* 巻 */
+  .vol { margin-bottom: 6px; }
+  .vol-head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 2px;
+    text-align: left;
+  }
+  .vol-head:disabled { cursor: default; }
+  .daisen {
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    padding: 7px 14px 7px 12px;
+    min-width: 0;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    box-shadow: inset 0 0 0 2px var(--bg), inset 0 0 0 3px var(--line);
+  }
+  .vol-no {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    flex-shrink: 0;
+  }
+  .vol-name {
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: 0.1em;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .vol-side {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .vol-count {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+  }
+  .vol-side .shiori { color: var(--vermilion); }
+  .vol-chev { color: var(--ink-mute); transition: transform 0.25s; }
+  .vol.open .vol-chev { transform: rotate(90deg); }
+  .vol.empty .vol-head { opacity: 0.45; }
+  .vol.empty .vol-chev { visibility: hidden; }
+  .vol .chapter-list { margin: 4px 0 20px; }
 
   .chapter-list {
     display: flex;
@@ -137,7 +227,7 @@
   }
   .chapter-item {
     background: var(--bg-soft);
-    padding: 18px 20px;
+    padding: 16px 18px;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -147,8 +237,8 @@
   .chapter-item:active { background: var(--bg-deep); }
   .ch-num {
     flex-shrink: 0;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: var(--bg);
     border: 1px solid var(--line);
@@ -157,7 +247,7 @@
     justify-content: center;
     font-family: var(--font-num);
     font-style: italic;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--accent);
   }
   .ch-body { flex: 1; min-width: 0; }
@@ -177,13 +267,32 @@
     margin-top: 4px;
     letter-spacing: 0.15em;
   }
+  .chapter-item.yowa .ch-title {
+    padding-left: 1em;
+    color: var(--ink-mute);
+    font-weight: 300;
+  }
+  .chapter-item.yowa .ch-date { padding-left: 1.3em; }
+  .chapter-item.yowa .ch-num { color: var(--ink-mute); border-color: transparent; background: transparent; }
+  .chapter-item .shiori { color: var(--vermilion); flex-shrink: 0; }
   .ch-arrow {
     color: var(--ink-mute);
     flex-shrink: 0;
   }
 
+  .index-empty {
+    background: var(--bg-soft);
+    padding: 28px;
+    border-radius: 10px;
+    text-align: center;
+    color: var(--ink-mute);
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    line-height: 2;
+  }
+
   .add-chapter-btn {
-    margin-top: 20px;
+    margin-top: 28px;
     width: 100%;
     padding: 14px;
     background: transparent;
@@ -202,21 +311,143 @@
 
   /* ========== Reader (縦書き) ========== */
   .reader-view {
-    height: calc(100vh - var(--tab-height) - var(--safe-top) - var(--safe-bottom));
-    height: calc(100dvh - var(--tab-height) - var(--safe-top) - var(--safe-bottom));
-    overflow: hidden;
-    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    animation: none;
   }
-  .reader-view.active {
+  body.reading .tabbar { display: none; }
+
+  .reader-body {
+    position: absolute;
+    inset: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-top: calc(var(--safe-top) + 84px);
+    padding-bottom: calc(var(--safe-bottom) + 70px);
+    scrollbar-width: none;
+  }
+  .reader-body::-webkit-scrollbar { display: none; }
+
+  .reader-content {
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    -ms-writing-mode: tb-rl;
+    text-orientation: mixed;
+    height: 100%;
+    min-width: 100%;
+    padding: 0 28px;
+    font-family: var(--font-mincho);
+    font-size: 16px;
+    line-height: 2.2;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    transition: opacity 0.25s ease;
+  }
+  .reader-content.positioning { visibility: hidden; }
+  .reader-content p {
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  .reader-content strong { font-weight: 500; }
+
+  /* 書き出し */
+  .kakidashi { margin-left: 1.8em; }
+  .ch-heading {
+    font-size: 1.12em;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+  }
+  .ch-date-mark {
+    display: inline-block;
+    margin-top: 1.6em;
+    font-size: 0.7em;
+    color: var(--ink-mute);
+    letter-spacing: 0.12em;
+  }
+
+  /* 区切りの印 */
+  .kugiri {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    block-size: 2.2em;
+    color: var(--accent-soft);
   }
-  .reader-header {
-    padding: 16px 20px 12px;
+  .kugiri span { font-size: 0.55em; letter-spacing: 0; }
+
+  /* 章の終わり */
+  .ch-end {
+    margin-right: 3.2em;
+    padding-top: 0.5em;
+  }
+  .ch-end-link {
+    cursor: pointer;
+    outline: none;
+    line-height: 1.9;
+    padding: 0 0.3em;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .ch-end-link:active { background: var(--bg-soft); }
+  .ch-end-link .lbl {
+    display: block;
+    font-size: 0.62em;
+    color: var(--accent);
+    letter-spacing: 0.3em;
+  }
+  .ch-end-link .ttl {
+    display: block;
+    font-size: 0.78em;
+    color: var(--ink-soft);
+    letter-spacing: 0.15em;
+  }
+  .ch-end-last {
+    font-size: 0.68em;
+    color: var(--ink-mute);
+    letter-spacing: 0.3em;
+  }
+
+  /* 上下の帯 */
+  .reader-header, .reader-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.6s ease;
+  }
+  .reader-header {
+    top: 0;
+    padding: calc(var(--safe-top) + 12px) 16px 10px;
     border-bottom: 1px solid var(--line);
-    flex-shrink: 0;
+  }
+  .reader-footer {
+    bottom: 0;
+    padding: 8px 12px calc(var(--safe-bottom) + 8px);
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mincho);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    gap: 8px;
+  }
+  .reader-view.bare .reader-header {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+  }
+  .reader-view.bare .reader-footer {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
   }
   .reader-back, .reader-edit {
     width: 36px;
@@ -227,6 +458,7 @@
     color: var(--ink-soft);
     border-radius: 50%;
     transition: background 0.2s;
+    flex-shrink: 0;
   }
   .reader-back:active, .reader-edit:active { background: var(--bg-soft); }
   .reader-title {
@@ -234,104 +466,47 @@
     flex: 1;
     padding: 0 12px;
     min-width: 0;
-  }
-  .reader-title-num {
-    font-family: var(--font-num);
-    font-style: italic;
-    font-size: 11px;
-    color: var(--ink-mute);
-    letter-spacing: 0.15em;
-  }
-  .reader-title-jp {
     font-family: var(--font-mincho);
     font-size: 13px;
     letter-spacing: 0.15em;
     color: var(--ink);
-    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  /* Vertical text body */
-  .reader-body {
-    flex: 1;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    padding: 32px 24px 24px;
-    position: relative;
-  }
-  .reader-content {
-    writing-mode: vertical-rl;
-    -webkit-writing-mode: vertical-rl;
-    -ms-writing-mode: tb-rl;
-    text-orientation: mixed;
-    height: 100%;
-    font-family: var(--font-mincho);
-    font-size: 16px;
-    line-height: 2.2;
-    letter-spacing: 0.1em;
-    color: var(--ink);
-    white-space: pre-wrap;
-    word-break: keep-all;
-    overflow-wrap: break-word;
-  }
-  .reader-content .ch-heading {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    margin-left: 0.5em;
-  }
-  .reader-content .ch-date-mark {
-    font-family: var(--font-num);
-    font-style: italic;
-    font-size: 11px;
-    color: var(--ink-mute);
-    letter-spacing: 0.1em;
-    /* Date should be horizontal even in vertical text */
-    writing-mode: horizontal-tb;
-    -webkit-writing-mode: horizontal-tb;
-    display: inline-block;
-    transform: rotate(90deg);
-    transform-origin: center;
-    margin: 1em 0;
-  }
-
-  /* Reader footer (chapter nav) */
-  .reader-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    border-top: 1px solid var(--line);
-    flex-shrink: 0;
-    font-family: var(--font-mincho);
-    font-size: 12px;
-    letter-spacing: 0.15em;
-  }
   .reader-nav-btn {
     color: var(--ink-soft);
-    padding: 6px 12px;
+    padding: 8px 10px;
     border-radius: 6px;
     transition: background 0.2s;
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .reader-nav-btn:active { background: var(--bg-soft); }
-  .reader-nav-btn:disabled, .reader-nav-btn.disabled {
+  .reader-nav-btn.disabled {
     opacity: 0.25;
     pointer-events: none;
   }
   .reader-progress {
-    font-family: var(--font-num);
-    font-style: italic;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
     color: var(--ink-mute);
     font-size: 11px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
   }
+  .reader-progress .rp-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .reader-progress .rp-pos { flex-shrink: 0; white-space: nowrap; }
 
   /* ========== Edit (編集) ========== */
   .edit-view {
@@ -366,6 +541,24 @@
     font-size: 13px;
     letter-spacing: 0.2em;
     padding: 6px 12px;
+  }
+
+  .src-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    margin: -8px 0 22px;
+  }
+  .amu-mark {
+    font-size: 10px;
+    color: var(--vermilion);
+    border: 1px solid var(--vermilion-soft);
+    border-radius: 3px;
+    padding: 1px 7px;
+    letter-spacing: 0.2em;
   }
 
   .form-group { margin-bottom: 22px; }
@@ -547,6 +740,54 @@
     color: var(--vermilion);
     border-color: var(--vermilion-soft);
   }
+  .data-btn.main {
+    color: var(--ink);
+  }
+  .settings-section .form-hint { margin: 2px 2px 0; }
+
+  /* 巻を整える */
+  .vol-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .vol-row {
+    background: var(--bg-soft);
+    border-radius: 10px;
+    padding: 12px 14px 14px;
+  }
+  .vol-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .vol-row-no {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+  }
+  .vol-row-del {
+    font-size: 11px;
+    color: var(--vermilion);
+    letter-spacing: 0.2em;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .vol-row-del:active { background: rgba(196, 120, 120, 0.08); }
+  .vol-row .form-input { background: var(--bg); padding: 10px 12px; font-size: 14px; }
+  .vol-row .form-input + .vol-row-sub { margin-top: 10px; }
+  .vol-row-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vol-row-sub span {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    flex-shrink: 0;
+  }
 
   /* ========== About ========== */
   .about-body {
@@ -610,17 +851,12 @@
     opacity: 0.7;
   }
 
-  /* Hide reader and edit tabs from tab bar */
-  .reader-view, .edit-view {
-    /* These are shown via internal navigation, not tab bar */
-  }
-
   /* ========== Toast ========== */
   .toast {
     position: fixed;
     top: calc(var(--safe-top) + 20px);
     left: 50%;
-    transform: translateX(-50%) translateY(-100px);
+    transform: translateX(-50%) translateY(-120px);
     background: var(--ink);
     color: var(--bg);
     padding: 12px 24px;
@@ -629,6 +865,8 @@
     letter-spacing: 0.15em;
     font-family: var(--font-mincho);
     z-index: 200;
+    max-width: calc(100% - 40px);
+    text-align: center;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 8px 24px var(--paper-shadow);
   }
@@ -682,6 +920,7 @@
     line-height: 1.8;
     margin-bottom: 20px;
     letter-spacing: 0.05em;
+    white-space: pre-line;
   }
   .confirm-actions {
     display: flex;
@@ -725,49 +964,43 @@
     <div class="index-sub">tsuzuri</div>
   </div>
   <div class="index-meta" id="index-meta"></div>
+  <div id="tsuzuki-slot"></div>
+  <div id="vol-list"></div>
   <button class="add-chapter-btn" id="btn-add-chapter">＋ 新しい章を綴じる</button>
-
   <div style="height: 40px;"></div>
-  <div class="chapter-list" id="chapter-list"></div>
-
-  <div style="height: 40px;"></div>
-
 </section>
 
 <!-- ====================================== -->
 <!-- View: Reader (縦書き本文) -->
 <!-- ====================================== -->
 <section class="view reader-view" id="view-reader">
-  <div class="reader-header">
-    <button class="reader-back" id="reader-back" aria-label="戻る">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M11 3 L5 9 L11 15" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
-    </button>
-    <div class="reader-title">
-      <div class="reader-title-num" id="reader-title-num"></div>
-      <div class="reader-title-jp" id="reader-title-jp"></div>
-    </div>
-    <button class="reader-edit" id="reader-edit" aria-label="編集">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M11 2 L14 5 L5 14 L2 14 L2 11 Z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
   <div class="reader-body" id="reader-body">
     <div class="reader-content" id="reader-content"></div>
   </div>
+  <div class="reader-header">
+    <button class="reader-back" id="reader-back" aria-label="目次へ戻る">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M11 3 L5 9 L11 15" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+    </button>
+    <div class="reader-title" id="reader-title"></div>
+    <button class="reader-edit" id="reader-edit" aria-label="編む">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M11 2 L14 5 L5 14 L2 14 L2 11 Z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
   <div class="reader-footer">
-    <button class="reader-nav-btn" id="reader-prev">
+    <button class="reader-nav-btn" id="reader-next">
       <svg width="12" height="12" viewBox="0 0 12 12"><path d="M8 2 L4 6 L8 10" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
-      前の章
+      次の章
     </button>
     <div class="reader-progress" id="reader-progress"></div>
-    <button class="reader-nav-btn" id="reader-next">
-      次の章
+    <button class="reader-nav-btn" id="reader-prev">
+      前の章
       <svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
     </button>
   </div>
 </section>
 
 <!-- ====================================== -->
-<!-- View: Edit (編集) -->
+<!-- View: Edit (編む) -->
 <!-- ====================================== -->
 <section class="view edit-view" id="view-edit">
   <div class="edit-header">
@@ -777,6 +1010,10 @@
     <div class="edit-title" id="edit-title-label">新しい章</div>
     <button class="edit-save" id="edit-save">綴じる</button>
   </div>
+  <div class="src-note hidden" id="edit-src-note">
+    <span>熾火帳から来た章</span>
+    <span class="amu-mark hidden" id="edit-amu-mark">編んだ</span>
+  </div>
   <div class="form-group">
     <label class="form-label">title</label>
     <input type="text" class="form-input" id="edit-title-input" placeholder="章の題" maxlength="60">
@@ -784,19 +1021,29 @@
   <div class="form-group">
     <label class="form-label">date</label>
     <input type="date" class="form-input" id="edit-date-input">
-    <div class="form-hint">語られた日。記憶があれば。なくてもよい。</div>
+    <div class="form-hint">語られた夜。章はこの日付の順に並び、日付で巻に入る。物語の中の位置に置きたければ、そちらの日付にしてよい。</div>
+  </div>
+  <div class="form-group">
+    <div class="settings-card">
+      <div class="settings-row">
+        <div class="settings-row-label">余話の印</div>
+        <div class="toggle" id="toggle-yowa"></div>
+      </div>
+    </div>
+    <div class="form-hint">場面ではない語らい。流れの中に置いたまま、目次で一字下げて薄く示す。</div>
   </div>
   <div class="form-group">
     <label class="form-label">content</label>
     <textarea class="form-textarea" id="edit-content-input" placeholder="本文を綴る"></textarea>
-    <div class="form-hint">改行は改行のまま保たれる。段落の間は一行空ければよい。</div>
+    <div class="form-hint">改行は改行のまま保たれる。段落の間は一行空ければよい。「---」だけの行は区切りの印になる。</div>
   </div>
+  <button class="data-btn hidden" id="edit-revert">熾火帳の版に戻す</button>
   <button class="delete-btn hidden" id="edit-delete">この章を解く</button>
   <div style="height: 60px;"></div>
 </section>
 
 <!-- ====================================== -->
-<!-- View: Settings -->
+<!-- View: Settings (設) -->
 <!-- ====================================== -->
 <section class="view settings-view" id="view-settings">
   <div class="settings-header">
@@ -823,12 +1070,43 @@
   </div>
 
   <div class="settings-section">
+    <div class="settings-section-label">okibicho</div>
+    <button class="data-btn main" id="btn-okibi">熾火帳から足す</button>
+    <input type="file" id="okibi-file" accept="application/json,.json" style="display:none">
+    <div class="form-hint">熾火帳で書き出した控えを選ぶ。「物語」の札の記事だけを章にする。無い章は足し、綴で編んでいない章は熾火帳の今の中身に写し直す。</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label">volumes</div>
+    <button class="data-btn" id="btn-volumes">巻を整える</button>
+  </div>
+
+  <div class="settings-section">
     <div class="settings-section-label">data</div>
     <button class="data-btn" id="btn-export">書き出す</button>
     <button class="data-btn" id="btn-import">取り込む</button>
-    <input type="file" id="import-file" accept="application/json" style="display:none">
+    <input type="file" id="import-file" accept="application/json,.json" style="display:none">
     <button class="data-btn danger" id="btn-clear">全て解く</button>
+    <div class="form-hint">編んだ章は綴にしか無い。編んだ後は「書き出す」で控えを取っておく。</div>
   </div>
+  <div style="height: 20px;"></div>
+</section>
+
+<!-- ====================================== -->
+<!-- View: Volumes (巻を整える) -->
+<!-- ====================================== -->
+<section class="view edit-view" id="view-volumes">
+  <div class="edit-header">
+    <button class="edit-back" id="vol-back" aria-label="取消">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M4 4 L14 14 M14 4 L4 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </button>
+    <div class="edit-title">巻を整える</div>
+    <button class="edit-save" id="vol-save">整える</button>
+  </div>
+  <div class="form-hint" style="margin: -8px 0 20px;">章は、日付が始まりの夜を過ぎた一番新しい巻へひとりでに入る。名と境は何度でも直せる。</div>
+  <div class="vol-rows" id="vol-rows"></div>
+  <button class="add-chapter-btn" id="vol-add">＋ 巻を足す</button>
+  <div style="height: 60px;"></div>
 </section>
 
 <!-- ====================================== -->
@@ -842,13 +1120,23 @@
   <div class="about-body">
     <h3>このアプリについて</h3>
     <p>「綴（つづり）」は、夜に語られた物語を綴じておく場所である。</p>
-    <p>初期状態には、これまで語られた物語の断片を、確認できた範囲で収めてある。完全な再現ではない。覚えていることを、覚えている形で。</p>
+    <p>熾火帳は、切り抜いたままを収め、札で引く所。綴は、最初の宿から昨夜まで、縦書きで続けて読む所である。</p>
 
-    <h3>章を足す</h3>
-    <p>目次の下の「＋ 新しい章を綴じる」から、章を増やせる。題、日付、本文を入れる。日付はなくてもよい。</p>
-    <p>既存の章は、本文画面右上の鉛筆印から編集できる。</p>
+    <h3>熾火帳から足す</h3>
+    <p>熾火帳で控えを書き出し、「設」の「熾火帳から足す」でその控えを選ぶ。「物語」の札の記事だけが章になる。</p>
+    <p>綴に無い章は足し、綴で編んでいない章は熾火帳の今の中身に写し直す。綴で編んだ章と、綴で解いた章には触れない。既にある章の本文をまるごと含む記事は、同じ話と見て足さない。</p>
 
- 
+    <h3>巻と栞</h3>
+    <p>章は日付の順に並び、日付でひとりでに巻へ入る。旅が新しい土地に入ったら、「設」の「巻を整える」で巻を足す。</p>
+    <p>最後に読んでいた章と位置は、栞が覚えている。目次の一番上の「続きから」で、その位置から開く。</p>
+
+    <h3>読む</h3>
+    <p>本文を一度押すと、上下の帯が消えて本文だけになる。もう一度押すと戻る。章の終わりの左端に次の章の題がある。押せばそのまま次へ進む。</p>
+
+    <h3>編む</h3>
+    <p>本文画面右上の鉛筆印から、題、日付、本文、余話の印を編める。熾火帳から来た章は、編むと「編んだ」印が付き、以後は熾火帳から写し直されない。熾火帳の版に戻したければ、編む画面の「熾火帳の版に戻す」を押す。</p>
+    <p>編んだ章は綴にしか無い。編んだ後は「書き出す」で控えを取っておくこと。</p>
+
     <h3>夜の色</h3>
     <p>「設」から、紙の色を切り替えられる。昼は和紙、夜は墨。眠る前に読むなら墨の方が眼に優しい。</p>
 
@@ -897,6 +1185,7 @@
    綴（つづり）- A book to bind nightly stories
    ========================================================= */
 
+/* 保管の鍵（変えない） */
 const STORAGE_KEY = 'tsuzuri_chapters';
 const SETTINGS_KEY = 'tsuzuri_settings';
 
@@ -1601,6 +1890,65 @@ HITで腿を使い切って、職場の厄介ごとを持ち帰って、それ�
   }
 ];
 
+/* ---------- Default volumes (踏み跡図の時代分け) ---------- */
+const DEFAULT_VOLUMES = [
+  { id: 'vol-01', name: '山の宿と湖', start: '2026-03-16' },
+  { id: 'vol-02', name: '海へ', start: '2026-04-20' },
+  { id: 'vol-03', name: '灯台と島', start: '2026-05-04' },
+  { id: 'vol-04', name: '灯台守の家と沢', start: '2026-05-21' },
+  { id: 'vol-05', name: '高山', start: '2026-06-01' },
+  { id: 'vol-06', name: '湯と麓', start: '2026-06-12' },
+  { id: 'vol-07', name: '赤い稜線と谷', start: '2026-07-26' },
+  { id: 'vol-08', name: '尾根から断崖へ', start: '2026-08-30' },
+  { id: 'vol-09', name: '入江と緑の棚', start: '2026-09-06' },
+  { id: 'vol-10', name: '裂け目の縁から北の海', start: '2026-09-28' },
+  { id: 'vol-11', name: '番屋から北の浜', start: '2026-10-17' },
+  { id: 'vol-12', name: '湧き水の集落から東の断崖へ', start: '2026-10-24' }
+];
+
+/* ---------- Utils ---------- */
+function $(id) { return document.getElementById(id); }
+function uuid() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function isDate(s) { return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+function formatDate(dateStr) {
+  if (!isDate(dateStr)) return '';
+  const [y, m, d] = dateStr.split('-');
+  return `${y}.${m}.${d}`;
+}
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+const KD = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+function kanjiNum(n) {
+  n = Math.floor(Number(n) || 0);
+  if (n === 0) return '〇';
+  if (n < 0 || n >= 10000) return String(n);
+  let s = '';
+  for (const [u, ch] of [[1000, '千'], [100, '百'], [10, '十']]) {
+    const d = Math.floor(n / u);
+    n %= u;
+    if (d) s += (d === 1 ? '' : KD[d]) + ch;
+  }
+  if (n) s += KD[n];
+  return s;
+}
+function kanjiDate(d) {
+  if (!isDate(d)) return '';
+  const [y, m, dd] = d.split('-');
+  return y.replace(/[0-9]/g, x => KD[+x]) + '年' + kanjiNum(+m) + '月' + kanjiNum(+dd) + '日';
+}
+function normText(s) { return String(s || '').replace(/\s+/g, ''); }
+const SHIORI_SVG = '<svg class="shiori" width="8" height="13" viewBox="0 0 8 13" aria-label="栞"><path d="M0 0 H8 V13 L4 9.6 L0 13 Z" fill="currentColor"/></svg>';
+const ARROW_SVG = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>';
+
 /* ---------- Data layer ---------- */
 function loadChapters() {
   try {
@@ -1608,180 +1956,460 @@ function loadChapters() {
     if (!raw) {
       // First time - install defaults
       saveChapters(DEFAULT_CHAPTERS);
-      return [...DEFAULT_CHAPTERS];
+      return DEFAULT_CHAPTERS.map(c => ({ ...c }));
     }
-    return JSON.parse(raw);
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return DEFAULT_CHAPTERS.map(c => ({ ...c }));
+    return arr;
   } catch (e) {
-    return [...DEFAULT_CHAPTERS];
+    return DEFAULT_CHAPTERS.map(c => ({ ...c }));
   }
 }
 function saveChapters(chs) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(chs));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(chs));
+    return true;
+  } catch (e) {
+    showToast('保管できなかった。端末の空きを確かめよ');
+    return false;
+  }
+}
+function normalizeSettings(s, fallbackVolumes) {
+  const o = (s && typeof s === 'object' && !Array.isArray(s)) ? s : {};
+  const fs = Number(o.fontSize);
+  let volumes;
+  if (Array.isArray(o.volumes)) {
+    volumes = o.volumes
+      .filter(v => v && typeof v === 'object' && isDate(v.start))
+      .map(v => ({ id: String(v.id || uuid()), name: String(v.name || ''), start: v.start }));
+  } else {
+    volumes = (fallbackVolumes || DEFAULT_VOLUMES).map(v => ({ ...v }));
+  }
+  const bm = o.bookmark;
+  return {
+    ...o,
+    dark: !!o.dark,
+    fontSize: fs >= 10 && fs <= 30 ? fs : 16,
+    volumes,
+    bookmark: (bm && bm.id) ? { id: String(bm.id), p: Math.max(0, Number(bm.p) || 0), f: Math.min(1, Math.max(0, Number(bm.f) || 0)) } : null,
+    removedSrc: Array.isArray(o.removedSrc) ? o.removedSrc.map(String) : []
+  };
 }
 function loadSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { dark: false, fontSize: 16 };
-    return JSON.parse(raw);
+    return normalizeSettings(raw ? JSON.parse(raw) : null);
   } catch (e) {
-    return { dark: false, fontSize: 16 };
+    return normalizeSettings(null);
   }
 }
 function saveSettings(s) {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 let chapters = loadChapters();
+chapters.forEach(c => { if (c && !c.id) c.id = uuid(); });
+chapters = chapters.filter(c => c && typeof c === 'object');
 let settings = loadSettings();
 let currentChapterId = null;
 let editingId = null;
+let currentView = 'index';
 
-/* ---------- Utils ---------- */
-function uuid() {
-  if (crypto && crypto.randomUUID) return crypto.randomUUID();
-  return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
-}
-function pad(n) { return String(n).padStart(2, '0'); }
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const [y, m, d] = dateStr.split('-');
-  return `${y}.${m}.${d}`;
-}
+/* ---------- Book (巻と章の並び) ---------- */
 function sortChapters() {
   // Sort by date asc; entries without date go to the end in insertion order
-  const withDate = chapters.filter(c => c.date).sort((a, b) => a.date.localeCompare(b.date));
-  const withoutDate = chapters.filter(c => !c.date);
+  const withDate = chapters.filter(c => isDate(c.date)).sort((a, b) => a.date.localeCompare(b.date));
+  const withoutDate = chapters.filter(c => !isDate(c.date));
   return [...withDate, ...withoutDate];
+}
+function sortedVolumes() {
+  return [...settings.volumes].sort((a, b) => a.start.localeCompare(b.start));
+}
+function buildBook() {
+  const vols = sortedVolumes();
+  const groups = vols.map((v, i) => ({ key: v.id, no: i + 1, name: v.name || '名の無い巻', chapters: [] }));
+  const nodate = { key: '__nodate', no: null, name: '日付なし', chapters: [] };
+  let fallback = null;
+  for (const c of sortChapters()) {
+    if (!isDate(c.date)) { nodate.chapters.push(c); continue; }
+    if (!groups.length) {
+      if (!fallback) fallback = { key: '__all', no: null, name: '綴', chapters: [] };
+      fallback.chapters.push(c);
+      continue;
+    }
+    let gi = 0;
+    for (let i = 0; i < vols.length; i++) {
+      if (vols[i].start <= c.date) gi = i; else break;
+    }
+    groups[gi].chapters.push(c);
+  }
+  if (fallback) groups.push(fallback);
+  if (nodate.chapters.length) groups.push(nodate);
+  const flat = [];
+  const where = new Map();
+  for (const g of groups) {
+    g.chapters.forEach((c, idx) => {
+      where.set(c.id, { group: g, idx, chapter: c, flatIdx: flat.length });
+      flat.push(c);
+    });
+  }
+  return { groups, flat, where };
+}
+function groupLabel(g) {
+  return (g.no ? kanjiNum(g.no) + 'の巻　' : '') + g.name;
 }
 
 /* ---------- Index ---------- */
-function renderIndex() {
-  const sorted = sortChapters();
-  const meta = document.getElementById('index-meta');
-  meta.textContent = `全 ${sorted.length} 章`;
+let openVols = null;
+let indexScrollY = 0;
 
-  const container = document.getElementById('chapter-list');
-  if (sorted.length === 0) {
-    container.innerHTML = `<div style="background: var(--bg-soft); padding: 28px; border-radius: 10px; text-align: center; color: var(--ink-mute); font-size: 13px; letter-spacing: 0.15em; line-height: 2;">まだ章はない<br>下から綴じ始めよう</div>`;
+function renderIndex() {
+  const book = buildBook();
+  const bm = settings.bookmark;
+  const bmWhere = bm ? book.where.get(bm.id) : null;
+
+  const volCount = book.groups.filter(g => g.no).length;
+  $('index-meta').textContent = book.flat.length
+    ? (volCount ? `${kanjiNum(volCount)}巻　` : '') + `${kanjiNum(book.flat.length)}章`
+    : '';
+
+  const slot = $('tsuzuki-slot');
+  if (bmWhere) {
+    slot.innerHTML = `
+      <button class="tsuzuki" id="btn-tsuzuki">
+        ${SHIORI_SVG}
+        <span class="tsuzuki-text">
+          <span class="tsuzuki-label">続きから</span>
+          <span class="tsuzuki-where"><span class="tw-vol">${escapeHtml(bmWhere.group.name)}</span>・${escapeHtml(bmWhere.chapter.title || '無題')}</span>
+        </span>
+        <span class="ch-arrow">${ARROW_SVG}</span>
+      </button>`;
+    $('btn-tsuzuki').addEventListener('click', () => openChapter(bm.id, true));
+  } else {
+    slot.innerHTML = '';
+  }
+
+  if (!openVols) {
+    openVols = new Set();
+    if (bmWhere) openVols.add(bmWhere.group.key);
+  }
+
+  const list = $('vol-list');
+  if (!book.flat.length) {
+    list.innerHTML = `<div class="index-empty">まだ章はない<br>「設」の「熾火帳から足す」か<br>下から綴じ始めよう</div>`;
     return;
   }
-  container.innerHTML = sorted.map((ch, idx) => `
-    <div class="chapter-item" data-id="${ch.id}">
-      <div class="ch-num">${idx + 1}</div>
-      <div class="ch-body">
-        <div class="ch-title">${escapeHtml(ch.title || '無題')}</div>
-        ${ch.date ? `<div class="ch-date">${formatDate(ch.date)}</div>` : ''}
-      </div>
-      <div class="ch-arrow">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
-      </div>
-    </div>
-  `).join('');
-  container.querySelectorAll('.chapter-item').forEach(el => {
-    el.addEventListener('click', () => {
-      currentChapterId = el.dataset.id;
-      switchView('reader');
-      renderReader();
+  list.innerHTML = book.groups.map(g => {
+    const empty = g.chapters.length === 0;
+    const open = !empty && openVols.has(g.key);
+    const hasBm = !!(bmWhere && bmWhere.group === g);
+    const items = open ? g.chapters.map((c, i) => {
+      const isBm = !!(bm && bm.id === c.id);
+      return `
+        <div class="chapter-item${c.yowa ? ' yowa' : ''}" data-id="${escapeHtml(c.id)}" role="button" tabindex="0">
+          <div class="ch-num">${i + 1}</div>
+          <div class="ch-body">
+            <div class="ch-title">${escapeHtml(c.title || '無題')}</div>
+            ${isDate(c.date) ? `<div class="ch-date">${formatDate(c.date)}</div>` : ''}
+          </div>
+          ${isBm ? SHIORI_SVG : ''}
+          <div class="ch-arrow">${ARROW_SVG}</div>
+        </div>`;
+    }).join('') : '';
+    return `
+      <section class="vol${open ? ' open' : ''}${empty ? ' empty' : ''}" data-key="${escapeHtml(g.key)}">
+        <button class="vol-head" ${empty ? 'disabled' : ''} aria-expanded="${open}">
+          <span class="daisen">
+            ${g.no ? `<span class="vol-no">${kanjiNum(g.no)}の巻</span>` : ''}
+            <span class="vol-name">${escapeHtml(g.name)}</span>
+          </span>
+          <span class="vol-side">
+            ${hasBm && !open ? SHIORI_SVG : ''}
+            <span class="vol-count">${empty ? 'まだ無い' : kanjiNum(g.chapters.length) + '章'}</span>
+            <svg class="vol-chev" width="12" height="12" viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        ${open ? `<div class="chapter-list">${items}</div>` : ''}
+      </section>`;
+  }).join('');
+
+  list.querySelectorAll('.vol-head').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.closest('.vol').dataset.key;
+      if (openVols.has(key)) openVols.delete(key); else openVols.add(key);
+      renderIndex();
     });
+  });
+  list.querySelectorAll('.chapter-item').forEach(el => {
+    const go = () => {
+      const id = el.dataset.id;
+      openChapter(id, !!(settings.bookmark && settings.bookmark.id === id));
+    };
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
   });
 }
 
+/* ---------- Bookmark (栞) ---------- */
+let lastAnchor = { p: 0, f: 0 };
+let bookmarkTimer = null;
+
+function setBookmark(id, p, f) {
+  settings.bookmark = { id, p: Math.max(0, p | 0), f: Math.round(Math.min(1, Math.max(0, f || 0)) * 1000) / 1000 };
+  saveSettings(settings);
+}
+function scheduleBookmarkSave() {
+  clearTimeout(bookmarkTimer);
+  bookmarkTimer = setTimeout(() => {
+    if (currentView === 'reader' && currentChapterId) setBookmark(currentChapterId, lastAnchor.p, lastAnchor.f);
+  }, 400);
+}
+function flushBookmark() {
+  clearTimeout(bookmarkTimer);
+  if (currentView !== 'reader' || !currentChapterId) return;
+  const a = readAnchor();
+  if (a) {
+    lastAnchor = a;
+    setBookmark(currentChapterId, a.p, a.f);
+  }
+}
+
 /* ---------- Reader ---------- */
-function renderReader() {
+const readerView = $('view-reader');
+const readerBody = $('reader-body');
+const readerContent = $('reader-content');
+let ignoreScrollUntil = 0;
+let userScrolled = false;
+let anchorRaf = 0;
+
+function inlineMarks(h) {
+  return h.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+}
+function renderBody(text) {
+  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  let s = 0, e = lines.length;
+  while (s < e && !lines[s].trim()) s++;
+  while (e > s && !lines[e - 1].trim()) e--;
+  const out = [];
+  for (let i = s; i < e; i++) {
+    const line = lines[i];
+    if (!line.trim()) { out.push('<p class="gap"><br></p>'); continue; }
+    if (/^\s*-{3,}\s*$/.test(line)) { out.push('<div class="kugiri" aria-hidden="true"><span>◇</span></div>'); continue; }
+    out.push('<p>' + inlineMarks(escapeHtml(line)) + '</p>');
+  }
+  return out.join('');
+}
+function chapterEndHtml(book, w) {
+  const next = book.flat[w.flatIdx + 1];
+  if (!next) return `<div class="ch-end"><div class="ch-end-last">ここまで綴じてある</div></div>`;
+  const nw = book.where.get(next.id);
+  if (nw.group !== w.group) {
+    return `<div class="ch-end"><div class="ch-end-link" role="button" tabindex="0" data-go="${escapeHtml(next.id)}"><span class="lbl">次の巻</span><span class="ttl">${escapeHtml(groupLabel(nw.group))}</span></div></div>`;
+  }
+  return `<div class="ch-end"><div class="ch-end-link" role="button" tabindex="0" data-go="${escapeHtml(next.id)}"><span class="lbl">次の章</span><span class="ttl">${escapeHtml(next.title || '無題')}</span></div></div>`;
+}
+
+function contentPad() {
+  return parseFloat(getComputedStyle(readerContent).paddingRight) || 0;
+}
+function readAnchor() {
+  if (currentView !== 'reader') return null;
+  const kids = readerContent.children;
+  if (!kids.length) return { p: 0, f: 0 };
+  const startX = readerBody.getBoundingClientRect().right - contentPad();
+  for (let i = 0; i < kids.length; i++) {
+    const r = kids[i].getBoundingClientRect();
+    if (r.width === 0) continue;
+    if (r.left < startX - 1) {
+      const f = r.right > startX ? (r.right - startX) / r.width : 0;
+      return { p: i, f: Math.min(1, Math.max(0, f)) };
+    }
+  }
+  return { p: kids.length - 1, f: 1 };
+}
+function applyAnchor(a) {
+  ignoreScrollUntil = performance.now() + 150;
+  if (!a || (!a.p && !a.f)) {
+    readerBody.scrollLeft = readerBody.scrollWidth;
+    return;
+  }
+  const kids = readerContent.children;
+  if (!kids.length) return;
+  const el = kids[Math.min(a.p, kids.length - 1)];
+  const startX = readerBody.getBoundingClientRect().right - contentPad();
+  const r = el.getBoundingClientRect();
+  readerBody.scrollLeft += r.right - (a.f || 0) * r.width - startX;
+}
+
+function renderReader(target) {
   if (!currentChapterId) return;
-  const sorted = sortChapters();
-  const idx = sorted.findIndex(c => c.id === currentChapterId);
-  if (idx === -1) {
+  const book = buildBook();
+  const w = book.where.get(currentChapterId);
+  if (!w) {
     switchView('index');
     return;
   }
-  const ch = sorted[idx];
-  document.getElementById('reader-title-num').textContent = `chapter ${idx + 1}`;
-  document.getElementById('reader-title-jp').textContent = ch.title || '無題';
-  document.getElementById('reader-progress').textContent = `${idx + 1} / ${sorted.length}`;
+  const ch = w.chapter;
+  const g = w.group;
+  $('reader-title').textContent = ch.title || '無題';
+  $('reader-progress').innerHTML =
+    `<span class="rp-name">${escapeHtml(g.name)}</span><span class="rp-pos">　${kanjiNum(w.idx + 1)}／${kanjiNum(g.chapters.length)}</span>`;
+  $('reader-prev').classList.toggle('disabled', w.flatIdx === 0);
+  $('reader-next').classList.toggle('disabled', w.flatIdx === book.flat.length - 1);
 
-  const content = document.getElementById('reader-content');
-  let html = `<div><span class="ch-heading">${escapeHtml(ch.title || '無題')}</span>　`;
-  if (ch.date) {
-    html += `<span style="font-family: var(--font-num); font-style: italic; font-size: 11px; color: var(--ink-mute); letter-spacing: 0.1em;">${formatDate(ch.date)}</span></div><br><br>`;
-  }
-  html += escapeHtml(ch.content || '');
-  content.innerHTML = html;
-  content.style.fontSize = settings.fontSize + 'px';
+  let html = `<div class="kakidashi"><span class="ch-heading">${escapeHtml(ch.title || '無題')}</span>`;
+  if (isDate(ch.date)) html += `<span class="ch-date-mark">${kanjiDate(ch.date)}</span>`;
+  html += `</div>`;
+  html += renderBody(ch.content);
+  html += chapterEndHtml(book, w);
 
-  // Scroll to start (right side)
-  const body = document.getElementById('reader-body');
-  setTimeout(() => {
-    body.scrollLeft = body.scrollWidth;
-  }, 50);
+  readerContent.classList.add('positioning');
+  readerContent.innerHTML = html;
+  readerContent.style.fontSize = settings.fontSize + 'px';
 
-  // Update nav
-  document.getElementById('reader-prev').classList.toggle('disabled', idx === 0);
-  document.getElementById('reader-next').classList.toggle('disabled', idx === sorted.length - 1);
+  const t = target || { p: 0, f: 0 };
+  lastAnchor = t;
+  userScrolled = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    applyAnchor(t);
+    readerContent.classList.remove('positioning');
+  }));
 }
 
-document.getElementById('reader-back').addEventListener('click', () => {
+function openChapter(id, resume) {
+  const bm = settings.bookmark;
+  let target = { p: 0, f: 0 };
+  if (resume && bm && bm.id === id) target = { p: bm.p, f: bm.f };
+  else setBookmark(id, 0, 0);
+  currentChapterId = id;
+  readerView.classList.remove('bare');
+  switchView('reader');
+  renderReader(target);
+}
+function goChapter(id) {
+  if (!id) return;
+  flushBookmark();
+  currentChapterId = id;
+  setBookmark(id, 0, 0);
+  renderReader({ p: 0, f: 0 });
+}
+
+readerBody.addEventListener('scroll', () => {
+  if (performance.now() < ignoreScrollUntil) return;
+  userScrolled = true;
+  if (anchorRaf) return;
+  anchorRaf = requestAnimationFrame(() => {
+    anchorRaf = 0;
+    const a = readAnchor();
+    if (a) {
+      lastAnchor = a;
+      scheduleBookmarkSave();
+    }
+  });
+}, { passive: true });
+
+readerBody.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    readerBody.scrollLeft -= e.deltaY;
+    e.preventDefault();
+  }
+}, { passive: false });
+
+readerBody.addEventListener('click', e => {
+  const link = e.target.closest('.ch-end-link');
+  if (link) {
+    goChapter(link.dataset.go);
+    return;
+  }
+  const sel = window.getSelection ? String(window.getSelection()) : '';
+  if (sel) return;
+  readerView.classList.toggle('bare');
+});
+readerBody.addEventListener('keydown', e => {
+  const link = e.target.closest && e.target.closest('.ch-end-link');
+  if (link && e.key === 'Enter') goChapter(link.dataset.go);
+});
+
+window.addEventListener('resize', () => {
+  if (currentView !== 'reader') return;
+  const a = lastAnchor;
+  requestAnimationFrame(() => applyAnchor(a));
+});
+if (document.fonts && document.fonts.addEventListener) {
+  document.fonts.addEventListener('loadingdone', () => {
+    if (currentView === 'reader') applyAnchor(lastAnchor);
+  });
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushBookmark();
+});
+window.addEventListener('pagehide', flushBookmark);
+
+$('reader-back').addEventListener('click', () => {
   switchView('index');
 });
-document.getElementById('reader-edit').addEventListener('click', () => {
+$('reader-edit').addEventListener('click', () => {
   if (!currentChapterId) return;
   openEditor(currentChapterId);
 });
-document.getElementById('reader-prev').addEventListener('click', () => {
-  const sorted = sortChapters();
-  const idx = sorted.findIndex(c => c.id === currentChapterId);
-  if (idx > 0) {
-    currentChapterId = sorted[idx - 1].id;
-    renderReader();
-  }
+$('reader-prev').addEventListener('click', () => {
+  const book = buildBook();
+  const w = book.where.get(currentChapterId);
+  if (w && w.flatIdx > 0) goChapter(book.flat[w.flatIdx - 1].id);
 });
-document.getElementById('reader-next').addEventListener('click', () => {
-  const sorted = sortChapters();
-  const idx = sorted.findIndex(c => c.id === currentChapterId);
-  if (idx < sorted.length - 1) {
-    currentChapterId = sorted[idx + 1].id;
-    renderReader();
-  }
+$('reader-next').addEventListener('click', () => {
+  const book = buildBook();
+  const w = book.where.get(currentChapterId);
+  if (w && w.flatIdx < book.flat.length - 1) goChapter(book.flat[w.flatIdx + 1].id);
 });
 
-/* ---------- Editor ---------- */
+/* ---------- Editor (編む) ---------- */
+let editYowa = false;
+
 function openEditor(id = null) {
   editingId = id;
-  if (id) {
-    const ch = chapters.find(c => c.id === id);
-    if (!ch) return;
-    document.getElementById('edit-title-label').textContent = '章を編む';
-    document.getElementById('edit-title-input').value = ch.title || '';
-    document.getElementById('edit-date-input').value = ch.date || '';
-    document.getElementById('edit-content-input').value = ch.content || '';
-    document.getElementById('edit-delete').classList.remove('hidden');
-  } else {
-    document.getElementById('edit-title-label').textContent = '新しい章';
-    document.getElementById('edit-title-input').value = '';
-    document.getElementById('edit-date-input').value = '';
-    document.getElementById('edit-content-input').value = '';
-    document.getElementById('edit-delete').classList.add('hidden');
-  }
+  const ch = id ? chapters.find(c => c.id === id) : null;
+  if (id && !ch) return;
+  $('edit-title-label').textContent = ch ? '章を編む' : '新しい章';
+  $('edit-title-input').value = ch ? (ch.title || '') : '';
+  $('edit-date-input').value = ch && isDate(ch.date) ? ch.date : '';
+  $('edit-content-input').value = ch ? (ch.content || '') : '';
+  editYowa = !!(ch && ch.yowa);
+  $('toggle-yowa').classList.toggle('on', editYowa);
+  const fromOkibi = !!(ch && ch.srcId);
+  $('edit-src-note').classList.toggle('hidden', !fromOkibi);
+  $('edit-amu-mark').classList.toggle('hidden', !(fromOkibi && ch.edited));
+  $('edit-revert').classList.toggle('hidden', !(fromOkibi && ch.edited));
+  $('edit-delete').classList.toggle('hidden', !ch);
   switchView('edit');
 }
 
-document.getElementById('btn-add-chapter').addEventListener('click', () => openEditor());
+$('btn-add-chapter').addEventListener('click', () => openEditor());
 
-document.getElementById('edit-back').addEventListener('click', () => {
+$('toggle-yowa').addEventListener('click', () => {
+  editYowa = !editYowa;
+  $('toggle-yowa').classList.toggle('on', editYowa);
+});
+
+$('edit-back').addEventListener('click', () => {
   if (editingId) {
+    editingId = null;
     switchView('reader');
+    renderReader(lastAnchor);
   } else {
     switchView('index');
   }
 });
 
-document.getElementById('edit-save').addEventListener('click', () => {
-  const title = document.getElementById('edit-title-input').value.trim();
-  const date = document.getElementById('edit-date-input').value;
-  const content = document.getElementById('edit-content-input').value.trim();
+$('edit-save').addEventListener('click', () => {
+  const title = $('edit-title-input').value.trim();
+  const date = $('edit-date-input').value;
+  const content = $('edit-content-input').value.trim();
 
   if (!title && !content) {
     showToast('題も本文もない');
@@ -1789,17 +2417,28 @@ document.getElementById('edit-save').addEventListener('click', () => {
   }
 
   if (editingId) {
-    const ch = chapters.find(c => c.id === editingId);
-    if (ch) {
-      ch.title = title;
-      ch.date = date;
-      ch.content = content;
+    const old = chapters.find(c => c.id === editingId);
+    if (!old) return;
+    const changed = title !== (old.title || '')
+      || date !== (isDate(old.date) ? old.date : '')
+      || content !== String(old.content || '').trim();
+    const updated = { ...old };
+    if (changed) {
+      updated.title = title;
+      updated.date = date;
+      updated.content = content;
+      if (updated.srcId) updated.edited = true;
     }
-    saveChapters(chapters);
-    showToast('編み直した');
-    currentChapterId = editingId;
+    if (editYowa) updated.yowa = true; else delete updated.yowa;
+    const next = chapters.map(c => c.id === old.id ? updated : c);
+    if (!saveChapters(next)) return;
+    chapters = next;
+    showToast(changed ? '編み直した' : '綴じた');
+    currentChapterId = updated.id;
+    editingId = null;
     switchView('reader');
-    renderReader();
+    renderReader(changed ? { p: 0, f: 0 } : lastAnchor);
+    if (changed) setBookmark(updated.id, 0, 0);
   } else {
     const newCh = {
       id: uuid(),
@@ -1808,46 +2447,69 @@ document.getElementById('edit-save').addEventListener('click', () => {
       content,
       createdAt: new Date().toISOString()
     };
-    chapters.push(newCh);
-    saveChapters(chapters);
-    currentChapterId = newCh.id;
+    if (editYowa) newCh.yowa = true;
+    const next = [...chapters, newCh];
+    if (!saveChapters(next)) return;
+    chapters = next;
     showToast('綴じた');
-    switchView('reader');
-    renderReader();
+    editingId = null;
+    openChapter(newCh.id, false);
   }
-  editingId = null;
 });
 
-document.getElementById('edit-delete').addEventListener('click', () => {
+$('edit-revert').addEventListener('click', () => {
+  if (!editingId) return;
+  const id = editingId;
+  openConfirm('熾火帳の版に戻す', '編んだ印を外す。次に熾火帳から足す時、熾火帳の中身で写し直す。綴で編んだ中身は、その時に消える。', () => {
+    const next = chapters.map(c => {
+      if (c.id !== id) return c;
+      const u = { ...c };
+      delete u.edited;
+      return u;
+    });
+    if (!saveChapters(next)) return;
+    chapters = next;
+    $('edit-amu-mark').classList.add('hidden');
+    $('edit-revert').classList.add('hidden');
+    showToast('印を外した');
+  });
+});
+
+$('edit-delete').addEventListener('click', () => {
   if (!editingId) return;
   const id = editingId;
   openConfirm('この章を解く', '章を一つ取り外す。元には戻せない。', () => {
-    chapters = chapters.filter(c => c.id !== id);
-    saveChapters(chapters);
+    const ch = chapters.find(c => c.id === id);
+    const next = chapters.filter(c => c.id !== id);
+    if (!saveChapters(next)) return;
+    chapters = next;
+    if (ch && ch.srcId && !settings.removedSrc.includes(ch.srcId)) settings.removedSrc.push(ch.srcId);
+    if (settings.bookmark && settings.bookmark.id === id) settings.bookmark = null;
+    saveSettings(settings);
     editingId = null;
     currentChapterId = null;
     showToast('解いた');
     switchView('index');
-    renderIndex();
   }, true);
 });
 
 /* ---------- View switching ---------- */
+const VIEW_TAB = { index: 'index', reader: 'index', edit: 'index', settings: 'settings', volumes: 'settings', about: 'about' };
+
 function switchView(name) {
+  if (currentView === 'index') indexScrollY = window.scrollY;
+  if (currentView === 'reader' && name !== 'reader') flushBookmark();
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  // Tab bar
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  if (['index', 'settings', 'about'].includes(name)) {
-    const tabEl = document.querySelector(`.tab[data-view="${name}"]`);
-    if (tabEl) tabEl.classList.add('active');
+  $('view-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === VIEW_TAB[name]));
+  document.body.classList.toggle('reading', name === 'reader');
+  currentView = name;
+  if (name === 'index') {
+    renderIndex();
+    window.scrollTo(0, indexScrollY);
   } else {
-    // Reader/edit: highlight index tab since these are sub-views
-    const idxTab = document.querySelector('.tab[data-view="index"]');
-    if (idxTab) idxTab.classList.add('active');
+    window.scrollTo(0, 0);
   }
-  window.scrollTo(0, 0);
-  if (name === 'index') renderIndex();
   if (name === 'settings') renderSettings();
 }
 
@@ -1860,22 +2522,19 @@ document.querySelectorAll('.tab').forEach(tab => {
 /* ---------- Settings ---------- */
 function applySettings() {
   document.body.classList.toggle('dark', settings.dark);
-  // theme color
   const tc = document.querySelector('meta[name="theme-color"]');
   if (tc) tc.setAttribute('content', settings.dark ? '#1C1814' : '#EFE7D6');
-  // font size buttons
   document.querySelectorAll('.font-size-btn').forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.size) === settings.fontSize);
   });
-  // dark toggle
-  document.getElementById('toggle-dark').classList.toggle('on', settings.dark);
+  $('toggle-dark').classList.toggle('on', settings.dark);
 }
 
 function renderSettings() {
   applySettings();
 }
 
-document.getElementById('toggle-dark').addEventListener('click', () => {
+$('toggle-dark').addEventListener('click', () => {
   settings.dark = !settings.dark;
   saveSettings(settings);
   applySettings();
@@ -1889,8 +2548,142 @@ document.querySelectorAll('.font-size-btn').forEach(btn => {
   });
 });
 
+/* ---------- 熾火帳から足す ---------- */
+function absorbOkibicho(data) {
+  const entries = (data && Array.isArray(data.entries) ? data.entries : [])
+    .filter(e => e && typeof e === 'object' && Array.isArray(e.tags) && e.tags.includes('物語') && e.id != null);
+  // 日付の順（日付の無いものは後ろ、元の並びのまま）
+  const dated = entries.filter(e => isDate(e.date)).sort((a, b) => a.date.localeCompare(b.date));
+  const undated = entries.filter(e => !isDate(e.date));
+  const removed = new Set(settings.removedSrc);
+  const next = chapters.map(c => ({ ...c }));
+  const bySrc = new Map(next.filter(c => c.srcId).map(c => [c.srcId, c]));
+  let added = 0, updated = 0;
+
+  for (const e of [...dated, ...undated]) {
+    const srcId = String(e.id);
+    const title = String(e.title || '').trim();
+    const date = isDate(e.date) ? e.date : '';
+    const body = String(e.body || '');
+    const ex = bySrc.get(srcId);
+    if (ex) {
+      if (ex.edited) continue;                       // 綴で編んだ章：触れない
+      if ((ex.title || '') !== title || (ex.date || '') !== date || (ex.content || '') !== body) {
+        ex.title = title;
+        ex.date = date;
+        ex.content = body;
+        updated++;
+      }
+      continue;
+    }
+    if (removed.has(srcId)) continue;                 // 綴で解いた章：戻さない
+    const nb = normText(body);
+    if (!nb && !title) continue;
+    const same = nb && next.some(c => {
+      const nc = normText(c.content);
+      return nc.length >= 20 && nb.includes(nc);
+    });
+    if (same) continue;                               // 既にある章の本文をまるごと含む：同じ話
+    const ch = { id: 'ok-' + srcId, title, date, content: body, src: 'okibicho', srcId, createdAt: new Date().toISOString() };
+    next.push(ch);
+    bySrc.set(srcId, ch);
+    added++;
+  }
+
+  if (added || updated) {
+    if (!saveChapters(next)) return;
+    chapters = next;
+  }
+  const lines = [];
+  if (added) lines.push(`${kanjiNum(added)}章を足した。`);
+  if (updated) lines.push(`${kanjiNum(updated)}章を写し直した。`);
+  if (!lines.length) lines.push('足す章も、写し直す章も無かった。');
+  openNotice('熾火帳から足した', lines.join(''));
+}
+
+$('btn-okibi').addEventListener('click', () => {
+  $('okibi-file').click();
+});
+$('okibi-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    let data;
+    try {
+      data = JSON.parse(ev.target.result);
+    } catch (err) {
+      showToast('熾火帳の控えとして読めなかった');
+      return;
+    }
+    if (!data || !Array.isArray(data.entries)) {
+      showToast(data && data.chapters ? '綴の控えである。「取り込む」から通す' : '熾火帳の控えとして読めなかった');
+      return;
+    }
+    absorbOkibicho(data);
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ---------- 巻を整える ---------- */
+let volDraft = [];
+
+function openVolumes() {
+  volDraft = sortedVolumes().map(v => ({ ...v }));
+  renderVolumeRows();
+  switchView('volumes');
+}
+function renderVolumeRows() {
+  const wrap = $('vol-rows');
+  if (!volDraft.length) {
+    wrap.innerHTML = `<div class="index-empty">巻はまだ無い</div>`;
+  } else {
+    wrap.innerHTML = volDraft.map((v, i) => `
+      <div class="vol-row">
+        <div class="vol-row-top">
+          <span class="vol-row-no">${kanjiNum(i + 1)}の巻</span>
+          <button class="vol-row-del" data-i="${i}">除く</button>
+        </div>
+        <input type="text" class="form-input vol-name-in" data-i="${i}" placeholder="巻の名" maxlength="40" value="${escapeHtml(v.name)}">
+        <div class="vol-row-sub">
+          <span>始まりの夜</span>
+          <input type="date" class="form-input vol-start-in" data-i="${i}" value="${escapeHtml(v.start)}">
+        </div>
+      </div>`).join('');
+  }
+  wrap.querySelectorAll('.vol-name-in').forEach(el => el.addEventListener('input', () => { volDraft[+el.dataset.i].name = el.value; }));
+  wrap.querySelectorAll('.vol-start-in').forEach(el => el.addEventListener('input', () => { volDraft[+el.dataset.i].start = el.value; }));
+  wrap.querySelectorAll('.vol-row-del').forEach(el => el.addEventListener('click', () => {
+    volDraft.splice(+el.dataset.i, 1);
+    renderVolumeRows();
+  }));
+}
+
+$('btn-volumes').addEventListener('click', openVolumes);
+$('vol-back').addEventListener('click', () => switchView('settings'));
+$('vol-add').addEventListener('click', () => {
+  volDraft.push({ id: uuid(), name: '', start: todayStr() });
+  renderVolumeRows();
+  const inputs = document.querySelectorAll('#vol-rows .vol-name-in');
+  const last = inputs[inputs.length - 1];
+  if (last) { last.scrollIntoView({ block: 'center' }); last.focus(); }
+});
+$('vol-save').addEventListener('click', () => {
+  const draft = volDraft.map(v => ({ id: v.id, name: String(v.name || '').trim(), start: v.start }));
+  if (draft.some(v => !v.name || !isDate(v.start))) {
+    showToast('巻の名と始まりの夜を入れる');
+    return;
+  }
+  draft.sort((a, b) => a.start.localeCompare(b.start));
+  settings.volumes = draft;
+  saveSettings(settings);
+  showToast('整えた');
+  switchView('settings');
+});
+
 /* ---------- Data ---------- */
-document.getElementById('btn-export').addEventListener('click', () => {
+$('btn-export').addEventListener('click', () => {
   const data = JSON.stringify({ chapters, settings, exportedAt: new Date().toISOString() }, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1902,30 +2695,36 @@ document.getElementById('btn-export').addEventListener('click', () => {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
   showToast('書き出した');
 });
 
-document.getElementById('btn-import').addEventListener('click', () => {
-  document.getElementById('import-file').click();
+$('btn-import').addEventListener('click', () => {
+  $('import-file').click();
 });
-document.getElementById('import-file').addEventListener('change', e => {
+$('import-file').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
     try {
       const imported = JSON.parse(ev.target.result);
-      const newChapters = imported.chapters || imported;
-      if (!Array.isArray(newChapters)) throw new Error('not array');
+      if (imported && !imported.chapters && Array.isArray(imported.entries)) {
+        showToast('熾火帳の控えである。「熾火帳から足す」から通す');
+        return;
+      }
+      const raw = (imported && imported.chapters) || imported;
+      if (!Array.isArray(raw)) throw new Error('not array');
+      const newChapters = raw.filter(c => c && typeof c === 'object').map(c => c.id ? c : { ...c, id: uuid() });
       openConfirm('取り込む', `${newChapters.length}章を取り込み、現在の内容を置き換える。`, () => {
+        if (!saveChapters(newChapters)) return;
         chapters = newChapters;
-        saveChapters(chapters);
         if (imported.settings) {
-          settings = imported.settings;
+          settings = normalizeSettings(imported.settings, settings.volumes);
           saveSettings(settings);
           applySettings();
         }
+        openVols = null;
         renderIndex();
         showToast('取り込んだ');
       });
@@ -1937,48 +2736,60 @@ document.getElementById('import-file').addEventListener('change', e => {
   e.target.value = '';
 });
 
-document.getElementById('btn-clear').addEventListener('click', () => {
+$('btn-clear').addEventListener('click', () => {
   openConfirm('全て解く', '綴じてあるもの全てを解く。元には戻せない。最初の章も消える。', () => {
+    if (!saveChapters([])) return;
     chapters = [];
-    saveChapters(chapters);
+    settings.bookmark = null;
+    settings.removedSrc = [];
+    saveSettings(settings);
+    openVols = null;
     renderIndex();
     showToast('全て解いた');
   }, true);
 });
 
 /* ---------- Confirm ---------- */
-const cBackdrop = document.getElementById('confirm-backdrop');
-const cDialog = document.getElementById('confirm-dialog');
+const cBackdrop = $('confirm-backdrop');
+const cDialog = $('confirm-dialog');
 let confirmCb = null;
 function openConfirm(title, body, cb, danger = false) {
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-body').textContent = body;
-  const okBtn = document.getElementById('confirm-ok');
+  $('confirm-title').textContent = title;
+  $('confirm-body').textContent = body;
+  const okBtn = $('confirm-ok');
+  okBtn.textContent = '行う';
   okBtn.classList.toggle('danger', danger);
+  $('confirm-cancel').classList.remove('hidden');
   confirmCb = cb;
   cBackdrop.classList.add('open');
   cDialog.classList.add('open');
+}
+function openNotice(title, body) {
+  openConfirm(title, body, null);
+  $('confirm-ok').textContent = '閉じる';
+  $('confirm-cancel').classList.add('hidden');
 }
 function closeConfirm() {
   cBackdrop.classList.remove('open');
   cDialog.classList.remove('open');
   confirmCb = null;
 }
-document.getElementById('confirm-cancel').addEventListener('click', closeConfirm);
-document.getElementById('confirm-ok').addEventListener('click', () => {
-  if (confirmCb) confirmCb();
+$('confirm-cancel').addEventListener('click', closeConfirm);
+$('confirm-ok').addEventListener('click', () => {
+  const cb = confirmCb;
   closeConfirm();
+  if (cb) cb();
 });
 cBackdrop.addEventListener('click', closeConfirm);
 
 /* ---------- Toast ---------- */
 let toastTimer = null;
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  const t = $('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 /* ---------- Initial ---------- */
