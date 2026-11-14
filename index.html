@@ -313,6 +313,8 @@
   .reader-view {
     position: fixed;
     inset: 0;
+    height: 100vh;
+    height: 100dvh;
     z-index: 60;
     animation: none;
   }
@@ -336,7 +338,8 @@
     -webkit-writing-mode: vertical-rl;
     -ms-writing-mode: tb-rl;
     text-orientation: mixed;
-    height: 100%;
+    height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 154px);
+    height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 154px);
     min-width: 100%;
     padding: 0 28px;
     font-family: var(--font-mincho);
@@ -2214,6 +2217,12 @@ function chapterEndHtml(book, w) {
   return `<div class="ch-end"><div class="ch-end-link" role="button" tabindex="0" data-go="${escapeHtml(next.id)}"><span class="lbl">次の章</span><span class="ttl">${escapeHtml(next.title || '無題')}</span></div></div>`;
 }
 
+function sizeContent() {
+  // 縦の長さを読む枠に合わせて明示する（iPhoneで列が下にはみ出すのを防ぐ）
+  const cs = getComputedStyle(readerBody);
+  const h = readerBody.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  if (h > 80) readerContent.style.height = Math.floor(h) + 'px';
+}
 function contentPad() {
   return parseFloat(getComputedStyle(readerContent).paddingRight) || 0;
 }
@@ -2271,11 +2280,13 @@ function renderReader(target) {
   readerContent.classList.add('positioning');
   readerContent.innerHTML = html;
   readerContent.style.fontSize = settings.fontSize + 'px';
+  sizeContent();
 
   const t = target || { p: 0, f: 0 };
   lastAnchor = t;
   userScrolled = false;
   requestAnimationFrame(() => requestAnimationFrame(() => {
+    sizeContent();
     applyAnchor(t);
     readerContent.classList.remove('positioning');
   }));
@@ -2338,7 +2349,7 @@ readerBody.addEventListener('keydown', e => {
 window.addEventListener('resize', () => {
   if (currentView !== 'reader') return;
   const a = lastAnchor;
-  requestAnimationFrame(() => applyAnchor(a));
+  requestAnimationFrame(() => { sizeContent(); applyAnchor(a); });
 });
 if (document.fonts && document.fonts.addEventListener) {
   document.fonts.addEventListener('loadingdone', () => {
