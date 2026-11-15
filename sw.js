@@ -3,7 +3,7 @@
    - 書体（Google Fonts）は、一度読んだものを手元に置いて使い回す
    - 章や栞は端末の保管（localStorage）にあり、ここでは扱わない */
 
-const VERSION = 'tsuzuri-v2';
+const VERSION = 'tsuzuri-v3';
 const SHELL = [
   './',
   './index.html',
@@ -68,16 +68,18 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 同じ場所のその他（manifest、印）：手元にあればそれ、無ければ取りに行く
+  // 同じ場所のその他（manifest、印）：まず新しいものを取りに行く。取れなければ手元の写し
   if (url.origin === location.origin) {
     event.respondWith(
-      caches.match(req).then(hit => hit || fetch(req).then(res => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(VERSION).then(c => c.put(req, copy));
-        }
-        return res;
-      }))
+      fetch(req)
+        .then(res => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(VERSION).then(c => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
   }
 });
